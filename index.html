@@ -37,10 +37,10 @@
             </div>
             <div class="flex items-center gap-2">
                 <span class="flex h-3 w-3 relative">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    <span id="sw-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span id="sw-dot" class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
                 </span>
-                <span id="sw-status-badge" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Mendaftarkan Service Worker...</span>
+                <span id="sw-status-badge" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Menghubungkan...</span>
             </div>
         </div>
     </header>
@@ -122,15 +122,15 @@
                     </div>
                     <input id="delay-slider" type="range" min="3" max="60" value="10" class="w-full accent-indigo-500 bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
                     <p class="text-[11px] text-slate-400 leading-normal">
-                        💡 <strong>Rekomendasi Eksperimen Ekstrem:</strong> Setel tunda ke <strong>15 atau 20 detik</strong>, klik tombol di bawah, lalu <strong>segera tutup tab ini (atau kunci layar HP Anda)</strong>. Service worker akan tetap menembakkan notifikasi setelah hitung mundur selesai!
+                        💡 <strong>Rekomendasi Eksperimen Ekstrem:</strong> Setel tunda ke <strong>10 atau 15 detik</strong>, klik tombol di bawah, lalu <strong>segera kunci layar HP Anda atau minimalkan browser Anda</strong>.
                     </p>
                 </div>
 
                 <!-- Action Button -->
                 <div class="pt-4 border-t border-slate-800">
                     <button id="btn-start-simulation" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2.5 transition-all">
-                        <i data-lucide="send" class="w-5 h-5"></i>
-                        Mulai Pengujian Latar Belakang (SW Thread)
+                        <i id="btn-icon" class="w-5 h-5" data-lucide="send"></i>
+                        <span id="btn-text">Mulai Pengujian Latar Belakang</span>
                     </button>
                 </div>
             </div>
@@ -168,11 +168,11 @@
                     <span id="countdown-timer">10</span>s
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
-                    👉 <strong>Segera tutup tab ini atau kunci ponsel Anda!</strong> Penjadwalan saat ini ditangani oleh utas independen Service Worker.
+                    👉 <strong>Segera tutup tab ini atau kunci ponsel Anda!</strong> Penjadwalan saat ini ditangani oleh latar belakang.
                 </p>
                 <div class="flex justify-center gap-1.5 text-[10px] text-amber-400/80 font-medium">
                     <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-                    Utas latar belakang mengunci memori hidup...
+                    <span id="countdown-subtext">Mengunci alur proses latar belakang...</span>
                 </div>
             </div>
 
@@ -181,32 +181,32 @@
                 <div>
                     <h3 class="text-md font-bold text-white flex items-center gap-2">
                         <i data-lucide="graduation-cap" class="w-5 h-5 text-indigo-400"></i>
-                        Mengapa Ini Bisa Terjadi? (Cara Kerja SW)
+                        Pemberitahuan Teknis PWA & Hosting
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1">Edukasi bagaimana Service Worker mampu memotong batasan tab tertutup.</p>
+                    <p class="text-xs text-slate-400 mt-1">Mengapa pendaftaran Service Worker Anda memunculkan pesan error sebelumnya?</p>
                 </div>
 
                 <div class="space-y-4 text-xs">
                     
                     <!-- Point 1 -->
                     <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-                        <div class="flex items-center gap-2 text-indigo-400 font-bold">
-                            <i data-lucide="cpu" class="w-4 h-4"></i>
-                            Mekanisme `event.waitUntil()`
+                        <div class="flex items-center gap-2 text-red-400 font-bold">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i>
+                            Penyebab: Larangan Protokol `blob:`
                         </div>
                         <p class="text-slate-300 leading-relaxed">
-                            Ketika tab ditutup, browser biasanya akan menghentikan seluruh proses JavaScript. Namun, Service Worker menggunakan API <code class="bg-slate-800 px-1 py-0.5 rounded text-indigo-300">event.waitUntil()</code> yang secara khusus meminta sistem operasi menahan proses tetap berjalan hingga *Promise* selesai dikerjakan.
+                            Browser secara eksplisit melarang registrasi Service Worker menggunakan <code class="bg-slate-800 px-1 py-0.5 rounded text-red-300">blob:</code> demi mencegah injeksi skrip jahat dari pihak ketiga. Service Worker <strong>wajib</strong> dimuat dari file fisik asli di domain yang sama (misal: <code class="bg-slate-800 px-1 py-0.5 rounded">./sw.js</code>).
                         </p>
                     </div>
 
                     <!-- Point 2 -->
                     <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
                         <div class="flex items-center gap-2 text-indigo-400 font-bold">
-                            <i data-lucide="volume-x" class="w-4 h-4"></i>
-                            Pembatasan Suara (Fakta Mendasar)
+                            <i data-lucide="wrench" class="w-4 h-4"></i>
+                            Cara Mengaktifkan Fitur SW Asli di GitHub Pages
                         </div>
                         <p class="text-slate-300 leading-relaxed">
-                            Meskipun notifikasi berhasil terpicu dari Service Worker saat tab mati, Anda **tetap tidak akan mendengar suara kustom** (seperti suara "Uang Masuk"). Anda hanya akan mendengar suara bawaan pabrik sistem operasi HP karena Service Worker tidak diizinkan memanggil *Audio Synth* browser saat tab tertutup.
+                            Cukup buat file bernama <strong><code class="text-indigo-300 font-mono">sw.js</code></strong> di folder utama repositori GitHub Pages Anda yang berisi kode penerima pesan, lalu sistem ini akan langsung mendeteksinya secara otomatis saat dimuat ulang! (Panduan kode di kolom obrolan).
                         </p>
                     </div>
 
@@ -222,9 +222,9 @@
                             </thead>
                             <tbody class="divide-y divide-slate-800 text-slate-300">
                                 <tr class="hover:bg-slate-800/30">
-                                    <td class="py-2.5 font-medium">JS Standard (setTimeout)</td>
-                                    <td class="py-2.5 text-center text-red-400 font-semibold">Mati total</td>
-                                    <td class="py-2.5 text-right text-slate-400">Tidak berbunyi</td>
+                                    <td class="py-2.5 font-medium">Lokal (Fallback)</td>
+                                    <td class="py-2.5 text-center text-amber-400 font-semibold">Tergantung OS*</td>
+                                    <td class="py-2.5 text-right text-slate-400">Hanya Nada OS Bawaan</td>
                                 </tr>
                                 <tr class="hover:bg-slate-800/30 bg-indigo-500/5">
                                     <td class="py-2.5 font-bold text-white">Service Worker Thread</td>
@@ -240,8 +240,8 @@
                         </table>
                     </div>
 
-                    <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-300 leading-normal">
-                        🎯 <strong>Fakta Terbukti:</strong> Melalui modifikasi ini, kita berhasil memicu notifikasi saat tab ditutup memakai Service Worker asli tanpa server eksternal, tetapi pembatasan audio kustom browser tetap berlaku 100%!
+                    <div class="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-300 leading-normal">
+                        ℹ️ <strong>Informasi Fallback:</strong> Saat berjalan di mode Fallback Lokal, browser seluler kemungkinan besar akan menjeda penghitungan waktu saat layar mati. Ini adalah bukti terbaik untuk ditunjukkan ke teman Anda mengapa kita wajib menggunakan Service Worker atau Aplikasi Native!
                     </div>
                 </div>
             </div>
@@ -280,6 +280,7 @@
         let timerInterval = null;
         let isTabActive = true;
         let activeServiceWorkerReg = null;
+        let isFallbackMode = true;
 
         // Initialize Lucide Icons
         lucide.createIcons();
@@ -289,7 +290,7 @@
             updatePermissionUI();
             log("[SISTEM] Memulai inisialisasi lingkungan PWA...");
             
-            // Register real robust service worker via inline blob compilation
+            // Register real robust service worker via inline compiled static file
             initServiceWorker();
 
             // Listen for visibility change to demonstrate foreground vs background behavior
@@ -309,74 +310,35 @@
             });
         });
 
-        // Initialize and Compile inline Service Worker
+        // Try to initialize a physical sw.js file (no more blob)
         function initServiceWorker() {
             if ('serviceWorker' in navigator) {
-                // Skrip Service Worker Asli dengan kemampuan background promise scheduler & event.waitUntil
-                const swCode = `
-                    self.addEventListener('install', (event) => {
-                        self.skipWaiting();
-                    });
-
-                    self.addEventListener('activate', (event) => {
-                        event.waitUntil(self.clients.claim());
-                    });
-
-                    self.addEventListener('message', (event) => {
-                        if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
-                            const { delay, notifType, title, body } = event.data;
-                            
-                            // Amankan thread agar tidak dimatikan paksa oleh browser di background
-                            event.waitUntil(
-                                new Promise((resolve) => {
-                                    setTimeout(() => {
-                                        const options = {
-                                            body: body,
-                                            icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=128',
-                                            vibrate: [200, 100, 200, 100, 200],
-                                            tag: 'simulasi-web-push',
-                                            requireInteraction: true,
-                                            data: { notifType: notifType }
-                                        };
-                                        
-                                        self.registration.showNotification(title, options);
-                                        
-                                        // Broadcast balik ke klien jika masih terbuka
-                                        self.clients.matchAll().then((clients) => {
-                                            clients.forEach((client) => {
-                                                client.postMessage({
-                                                    type: 'BACKGROUND_FIRED',
-                                                    notifType: notifType
-                                                });
-                                            });
-                                        });
-
-                                        resolve();
-                                    }, delay);
-                                })
-                            );
-                        }
-                    });
-                `;
-
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const blobUrl = URL.createObjectURL(blob);
-
-                navigator.serviceWorker.register(blobUrl).then((registration) => {
+                // Mencoba memanggil file sw.js lokal dari host yang sama
+                navigator.serviceWorker.register('./sw.js').then((registration) => {
                     activeServiceWorkerReg = registration;
+                    isFallbackMode = false;
+                    
                     const badge = document.getElementById('sw-status-badge');
+                    const swPing = document.getElementById('sw-ping');
+                    const swDot = document.getElementById('sw-dot');
+                    
                     badge.textContent = "Service Worker Aktif & Siap";
                     badge.className = "text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20";
-                    log("[SISTEM] Utas Service Worker berhasil dibangun di latar belakang.");
+                    swPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                    swDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+                    
+                    log("[SISTEM] Utas Service Worker fisik ditemukan & berhasil diaktifkan di domain ini!");
                 }).catch((error) => {
-                    log(`[ERROR] Gagal merakit Service Worker: ${error.message}`);
+                    // Masuk ke Mode Fallback jika file sw.js tidak ada di server
+                    setupFallbackMode();
+                    log(`[INFO] Registrasi SW di-bypass: ${error.message}`);
+                    log("[PERINGATAN] Berjalan di mode 'Fallback Lokal'. Untuk mengaktifkan Service Worker sungguhan di GitHub Pages Anda, buatlah file 'sw.js' di repositori Anda.");
                 });
 
                 // Listen messages back from service worker
                 navigator.serviceWorker.addEventListener('message', (event) => {
                     if (event.data && event.data.type === 'BACKGROUND_FIRED') {
                         log("[SISTEM] Pesan diterima dari Service Worker: Notifikasi telah ditembakkan ke OS!");
-                        // Putar suara lokal hanya jika tab aktif/foreground
                         if (isTabActive) {
                             playSynthesizedSound(event.data.notifType);
                             log("[SUARA] Memutar suara lokal sintetis (karena terdeteksi Tab Aktif).");
@@ -386,8 +348,22 @@
                     }
                 });
             } else {
-                log("[PERINGATAN] Browser ini tidak mendukung teknologi Service Worker.");
+                setupFallbackMode();
+                log("[PERINGATAN] Browser ini tidak mendukung teknologi Service Worker. Berjalan di Mode Fallback.");
             }
+        }
+
+        // Setup UI for Fallback Simulation Mode
+        function setupFallbackMode() {
+            isFallbackMode = true;
+            activeServiceWorkerReg = null;
+            
+            const badge = document.getElementById('sw-status-badge');
+            badge.textContent = "Mode Fallback Lokal";
+            badge.className = "text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20";
+            
+            const btnText = document.getElementById('btn-text');
+            btnText.textContent = "Mulai Pengujian (Mode Fallback)";
         }
 
         // Logger Function
@@ -586,16 +562,37 @@
             delayLabel.textContent = `${e.target.value} Detik`;
         });
 
-        // Dispatch scheduler to Service Worker
+        // Trigger Notification Instantly
+        function fireNotificationVisual(title, bodyText) {
+            const options = {
+                body: bodyText,
+                icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=128',
+                vibrate: [200, 100, 200, 100, 200],
+                tag: 'simulasi-web-push',
+                requireInteraction: true
+            };
+
+            // Tampilkan Notifikasi Sistem
+            if (activeServiceWorkerReg) {
+                activeServiceWorkerReg.showNotification(title, options);
+            } else {
+                new Notification(title, options);
+            }
+
+            // Putar suara lokal hanya jika tab aktif/foreground
+            if (isTabActive) {
+                playSynthesizedSound(selectedNotificationType);
+                log("[SUARA] Memutar suara lokal sintetis (karena Tab terdeteksi Aktif).");
+            } else {
+                log("[PERINGATAN] Tab sedang tidak aktif di latar depan. Browser memblokir pemutaran suara kustom. Hanya notifikasi sistem yang terpicu!");
+            }
+        }
+
+        // Dispatch scheduler (Acts as Router between Real SW and Fallback Local Scheduler)
         function dispatchBackgroundScheduler() {
             if (Notification.permission !== 'granted') {
                 log("[ERROR] Gagal menjadwalkan: Izin tidak diberikan.");
                 showModal("Izin Dibutuhkan", "Mohon berikan izin notifikasi terlebih dahulu sebelum memulai simulasi.", "error");
-                return;
-            }
-
-            if (!activeServiceWorkerReg) {
-                log("[ERROR] Service Worker belum siap/aktif.");
                 return;
             }
 
@@ -607,45 +604,58 @@
             const delayValue = parseInt(delaySlider.value);
             const countdownCard = document.getElementById('countdown-card');
             const countdownTimer = document.getElementById('countdown-timer');
+            const countdownSubtext = document.getElementById('countdown-subtext');
 
             // Reset any active client UI timer
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
 
-            // Kirim payload penjadwalan ke Service Worker
-            navigator.serviceWorker.ready.then((reg) => {
-                if (reg.active) {
-                    reg.active.postMessage({
-                        type: 'SCHEDULE_NOTIFICATION',
-                        delay: delayValue * 1000,
-                        notifType: selectedNotificationType,
-                        title: title,
-                        body: bodyText
-                    });
-                    
-                    log(`[SISTEM] Perintah dikirim ke Service Worker! Menjadwalkan ${delayValue} detik.`);
-                    
-                    // Show client-side fallback timer (untuk visualisasi pengguna jika tab belum ditutup)
-                    let currentSeconds = delayValue;
-                    countdownTimer.textContent = currentSeconds;
-                    countdownCard.classList.remove('hidden');
-                    countdownCard.scrollIntoView({ behavior: 'smooth' });
-
-                    timerInterval = setInterval(() => {
-                        currentSeconds--;
-                        countdownTimer.textContent = currentSeconds;
-                        log(`[KLIEN] Sisa waktu di layar: ${currentSeconds}s`);
+            // JIKA SERVICE WORKER RIIL AKTIF
+            if (activeServiceWorkerReg && !isFallbackMode) {
+                navigator.serviceWorker.ready.then((reg) => {
+                    if (reg.active) {
+                        reg.active.postMessage({
+                            type: 'SCHEDULE_NOTIFICATION',
+                            delay: delayValue * 1000,
+                            notifType: selectedNotificationType,
+                            title: title,
+                            body: bodyText
+                        });
                         
-                        if (currentSeconds <= 0) {
-                            clearInterval(timerInterval);
-                            countdownCard.classList.add('hidden');
-                        }
-                    }, 1000);
-                } else {
-                    log("[ERROR] Utas Service Worker tidak merespons pengiriman pesan.");
+                        log(`[SISTEM] Perintah dikirim ke Service Worker fisik! Menjadwalkan ${delayValue} detik.`);
+                        countdownSubtext.textContent = "Diatur oleh Service Worker Mandiri (Anti-Throttling)";
+                    }
+                });
+            } else {
+                // JIKA JATUH KE MODE FALLBACK LOKAL
+                log(`[SISTEM] Menjalankan Penjadwal Klien (Fallback) selama ${delayValue} detik.`);
+                log("[PERINGATAN] Mode Fallback Lokal aktif. Browser kemungkinan besar akan menjeda penghitung waktu jika Anda mengunci HP atau tab ditutup.");
+                countdownSubtext.textContent = "Menggunakan Penjadwal Lokal Halaman (Akan terjeda jika tab mati)";
+            }
+
+            // Tampilkan Hitung Mundur Di Layar untuk kedua mode
+            let currentSeconds = delayValue;
+            countdownTimer.textContent = currentSeconds;
+            countdownCard.classList.remove('hidden');
+            countdownCard.scrollIntoView({ behavior: 'smooth' });
+
+            timerInterval = setInterval(() => {
+                currentSeconds--;
+                countdownTimer.textContent = currentSeconds;
+                log(`[TIMER] Hitung mundur: ${currentSeconds}s`);
+                
+                if (currentSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    countdownCard.classList.add('hidden');
+                    
+                    // Jika di mode fallback lokal, jalankan notifikasi secara langsung dari halaman web
+                    if (isFallbackMode) {
+                        log("[KLIEN] Waktu habis! Memicu notifikasi dari halaman lokal.");
+                        fireNotificationVisual(title, bodyText);
+                    }
                 }
-            });
+            }, 1000);
         }
 
         // Action Button Listener
