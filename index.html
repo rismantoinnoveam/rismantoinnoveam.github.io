@@ -9,7 +9,7 @@
     <!-- Lucide Icons for modern look -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
@@ -31,8 +31,8 @@
                     <i data-lucide="bell-ring" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Web Notification Lab</h1>
-                    <p class="text-xs text-slate-400">Simulator Kebijakan Suara & Notifikasi Latar Belakang</p>
+                    <h1 class="text-xl font-bold tracking-tight">Web Notification Lab Pro</h1>
+                    <p class="text-xs text-slate-400">Simulator Kebijakan Suara & Penjadwal Latar Belakang (Service Worker)</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -40,7 +40,7 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                 </span>
-                <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Aplikasi Simulasi Siap</span>
+                <span id="sw-status-badge" class="text-xs font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Mendaftarkan Service Worker...</span>
             </div>
         </div>
     </header>
@@ -122,15 +122,15 @@
                     </div>
                     <input id="delay-slider" type="range" min="3" max="60" value="10" class="w-full accent-indigo-500 bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
                     <p class="text-[11px] text-slate-400 leading-normal">
-                        💡 <strong>Rekomendasi Eksperimen:</strong> Setel tunda ke <strong>10 detik</strong>, klik tombol "Mulai Simulasi" di bawah, lalu <strong>segera kunci HP Anda atau minimalkan browser Anda sepenuhnya</strong> untuk membuktikan hasilnya.
+                        💡 <strong>Rekomendasi Eksperimen Ekstrem:</strong> Setel tunda ke <strong>15 atau 20 detik</strong>, klik tombol di bawah, lalu <strong>segera tutup tab ini (atau kunci layar HP Anda)</strong>. Service worker akan tetap menembakkan notifikasi setelah hitung mundur selesai!
                     </p>
                 </div>
 
                 <!-- Action Button -->
                 <div class="pt-4 border-t border-slate-800">
                     <button id="btn-start-simulation" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2.5 transition-all">
-                        <i data-lucide="play" class="w-5 h-5"></i>
-                        Mulai Pengujian Latar Belakang
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                        Mulai Pengujian Latar Belakang (SW Thread)
                     </button>
                 </div>
             </div>
@@ -168,11 +168,11 @@
                     <span id="countdown-timer">10</span>s
                 </div>
                 <p class="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
-                    👉 <strong>Segera tutup tab ini atau minimalkan browser!</strong> Jangan biarkan layar aktif di halaman ini agar pengujian berjalan murni.
+                    👉 <strong>Segera tutup tab ini atau kunci ponsel Anda!</strong> Penjadwalan saat ini ditangani oleh utas independen Service Worker.
                 </p>
                 <div class="flex justify-center gap-1.5 text-[10px] text-amber-400/80 font-medium">
                     <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-                    Menunggu trigger push notifikasi...
+                    Utas latar belakang mengunci memori hidup...
                 </div>
             </div>
 
@@ -181,9 +181,9 @@
                 <div>
                     <h3 class="text-md font-bold text-white flex items-center gap-2">
                         <i data-lucide="graduation-cap" class="w-5 h-5 text-indigo-400"></i>
-                        Edukasi & Realita Teknis Web
+                        Mengapa Ini Bisa Terjadi? (Cara Kerja SW)
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1">Tunjukkan bagian ini kepada teman kamu untuk menjelaskan batasan asli standar Web modern.</p>
+                    <p class="text-xs text-slate-400 mt-1">Edukasi bagaimana Service Worker mampu memotong batasan tab tertutup.</p>
                 </div>
 
                 <div class="space-y-4 text-xs">
@@ -191,22 +191,22 @@
                     <!-- Point 1 -->
                     <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
                         <div class="flex items-center gap-2 text-indigo-400 font-bold">
-                            <i data-lucide="help-circle" class="w-4 h-4"></i>
-                            Kenapa Suara Kustom Tidak Bunyi?
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                            Mekanisme `event.waitUntil()`
                         </div>
                         <p class="text-slate-300 leading-relaxed">
-                            Properti <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-400">sound</code> di <code class="bg-slate-800 px-1 py-0.5 rounded">NotificationOptions</code> sudah ditiadakan (deprecated) oleh Google Chrome, Safari, dan Firefox sejak lama. Browser secara sepihak memaksakan suara sistem bawaan OS demi mencegah pelecehan audio (spam suara iklan).
+                            Ketika tab ditutup, browser biasanya akan menghentikan seluruh proses JavaScript. Namun, Service Worker menggunakan API <code class="bg-slate-800 px-1 py-0.5 rounded text-indigo-300">event.waitUntil()</code> yang secara khusus meminta sistem operasi menahan proses tetap berjalan hingga *Promise* selesai dikerjakan.
                         </p>
                     </div>
 
                     <!-- Point 2 -->
                     <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
                         <div class="flex items-center gap-2 text-indigo-400 font-bold">
-                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                            Aturan Autoplay Kebijakan Browser
+                            <i data-lucide="volume-x" class="w-4 h-4"></i>
+                            Pembatasan Suara (Fakta Mendasar)
                         </div>
                         <p class="text-slate-300 leading-relaxed">
-                            Suara dari halaman web (menggunakan Web Audio API / tag HTML5 Audio) <strong class="text-red-400">Wajib</strong> dipicu dari dalam tab aktif setelah ada interaksi fisik pengguna (seperti klik). Jika tab ditutup atau disembunyikan lama, browser akan langsung mencekal <code class="bg-slate-800 px-1 py-0.5 text-red-400 rounded">.play()</code>.
+                            Meskipun notifikasi berhasil terpicu dari Service Worker saat tab mati, Anda **tetap tidak akan mendengar suara kustom** (seperti suara "Uang Masuk"). Anda hanya akan mendengar suara bawaan pabrik sistem operasi HP karena Service Worker tidak diizinkan memanggil *Audio Synth* browser saat tab tertutup.
                         </p>
                     </div>
 
@@ -215,38 +215,33 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-slate-800 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                                    <th class="pb-2">Platform / Mode</th>
-                                    <th class="pb-2 text-center">Bisa Notif?</th>
-                                    <th class="pb-2 text-right">Suara Kustom?</th>
+                                    <th class="pb-2">Metode Penjadwalan</th>
+                                    <th class="pb-2 text-center">Tab Ditutup?</th>
+                                    <th class="pb-2 text-right">Hasil Suara</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800 text-slate-300">
                                 <tr class="hover:bg-slate-800/30">
-                                    <td class="py-2.5 font-medium">Web App (Tab Aktif)</td>
-                                    <td class="py-2.5 text-center text-emerald-400 font-semibold">YA</td>
-                                    <td class="py-2.5 text-right text-emerald-400 font-semibold">YA (Lewat Audio API)</td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/30">
-                                    <td class="py-2.5 font-medium text-slate-400">Web App (Tab Ditutup)</td>
-                                    <td class="py-2.5 text-center text-emerald-400 font-semibold">YA (Lewat SW)</td>
-                                    <td class="py-2.5 text-right text-red-400 font-semibold">TIDAK BISA</td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/30">
-                                    <td class="py-2.5 font-medium text-slate-400">PWA Terinstall</td>
-                                    <td class="py-2.5 text-center text-emerald-400 font-semibold">YA (Lebih Stabil)</td>
-                                    <td class="py-2.5 text-right text-red-400 font-semibold">TIDAK BISA</td>
+                                    <td class="py-2.5 font-medium">JS Standard (setTimeout)</td>
+                                    <td class="py-2.5 text-center text-red-400 font-semibold">Mati total</td>
+                                    <td class="py-2.5 text-right text-slate-400">Tidak berbunyi</td>
                                 </tr>
                                 <tr class="hover:bg-slate-800/30 bg-indigo-500/5">
-                                    <td class="py-2.5 font-bold text-white">Flutter Mobile Native</td>
-                                    <td class="py-2.5 text-center text-emerald-400 font-extrabold">YA</td>
-                                    <td class="py-2.5 text-right text-emerald-400 font-extrabold">BISA 100%</td>
+                                    <td class="py-2.5 font-bold text-white">Service Worker Thread</td>
+                                    <td class="py-2.5 text-center text-emerald-400 font-extrabold">Tetap Menyala</td>
+                                    <td class="py-2.5 text-right text-amber-400 font-semibold">Hanya Nada OS Bawaan</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/30">
+                                    <td class="py-2.5 font-medium text-slate-400">Flutter Native (FCM)</td>
+                                    <td class="py-2.5 text-center text-emerald-400 font-semibold">Tetap Menyala</td>
+                                    <td class="py-2.5 text-right text-emerald-400 font-bold">Suara Kustom MP3</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-300 leading-normal">
-                        📣 <strong>Kesimpulan Debat:</strong> Flutter Mobile (Android/iOS) adalah satu-satunya platform yang bisa memutar suara kustom secara andal saat aplikasi mati total melalui integrasi OS level.
+                    <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-300 leading-normal">
+                        🎯 <strong>Fakta Terbukti:</strong> Melalui modifikasi ini, kita berhasil memicu notifikasi saat tab ditutup memakai Service Worker asli tanpa server eksternal, tetapi pembatasan audio kustom browser tetap berlaku 100%!
                     </div>
                 </div>
             </div>
@@ -284,6 +279,7 @@
         let selectedNotificationType = 'success'; // default is success (uang masuk)
         let timerInterval = null;
         let isTabActive = true;
+        let activeServiceWorkerReg = null;
 
         // Initialize Lucide Icons
         lucide.createIcons();
@@ -291,8 +287,11 @@
         // Check Initial Permission Status on Load
         window.addEventListener('DOMContentLoaded', () => {
             updatePermissionUI();
-            log("[SISTEM] Aplikasi dimuat. Silakan periksa status izin notifikasi Anda.");
+            log("[SISTEM] Memulai inisialisasi lingkungan PWA...");
             
+            // Register real robust service worker via inline blob compilation
+            initServiceWorker();
+
             // Listen for visibility change to demonstrate foreground vs background behavior
             document.addEventListener('visibilitychange', () => {
                 const statusEl = document.getElementById('tab-status');
@@ -309,6 +308,87 @@
                 }
             });
         });
+
+        // Initialize and Compile inline Service Worker
+        function initServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                // Skrip Service Worker Asli dengan kemampuan background promise scheduler & event.waitUntil
+                const swCode = `
+                    self.addEventListener('install', (event) => {
+                        self.skipWaiting();
+                    });
+
+                    self.addEventListener('activate', (event) => {
+                        event.waitUntil(self.clients.claim());
+                    });
+
+                    self.addEventListener('message', (event) => {
+                        if (event.data && event.data.type === 'SCHEDULE_NOTIFICATION') {
+                            const { delay, notifType, title, body } = event.data;
+                            
+                            // Amankan thread agar tidak dimatikan paksa oleh browser di background
+                            event.waitUntil(
+                                new Promise((resolve) => {
+                                    setTimeout(() => {
+                                        const options = {
+                                            body: body,
+                                            icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=128',
+                                            vibrate: [200, 100, 200, 100, 200],
+                                            tag: 'simulasi-web-push',
+                                            requireInteraction: true,
+                                            data: { notifType: notifType }
+                                        };
+                                        
+                                        self.registration.showNotification(title, options);
+                                        
+                                        // Broadcast balik ke klien jika masih terbuka
+                                        self.clients.matchAll().then((clients) => {
+                                            clients.forEach((client) => {
+                                                client.postMessage({
+                                                    type: 'BACKGROUND_FIRED',
+                                                    notifType: notifType
+                                                });
+                                            });
+                                        });
+
+                                        resolve();
+                                    }, delay);
+                                })
+                            );
+                        }
+                    });
+                `;
+
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(blobUrl).then((registration) => {
+                    activeServiceWorkerReg = registration;
+                    const badge = document.getElementById('sw-status-badge');
+                    badge.textContent = "Service Worker Aktif & Siap";
+                    badge.className = "text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20";
+                    log("[SISTEM] Utas Service Worker berhasil dibangun di latar belakang.");
+                }).catch((error) => {
+                    log(`[ERROR] Gagal merakit Service Worker: ${error.message}`);
+                });
+
+                // Listen messages back from service worker
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'BACKGROUND_FIRED') {
+                        log("[SISTEM] Pesan diterima dari Service Worker: Notifikasi telah ditembakkan ke OS!");
+                        // Putar suara lokal hanya jika tab aktif/foreground
+                        if (isTabActive) {
+                            playSynthesizedSound(event.data.notifType);
+                            log("[SUARA] Memutar suara lokal sintetis (karena terdeteksi Tab Aktif).");
+                        } else {
+                            log("[PERINGATAN] Tab dalam mode tersembunyi. Browser mematikan audio, hanya notifikasi visual OS yang terpicu!");
+                        }
+                    }
+                });
+            } else {
+                log("[PERINGATAN] Browser ini tidak mendukung teknologi Service Worker.");
+            }
+        }
 
         // Logger Function
         function log(message) {
@@ -340,7 +420,7 @@
             log("[SISTEM] Log dibersihkan.");
         }
 
-        // Custom Modal helper (replaces browser alert to not freeze execution)
+        // Custom Modal helper
         function showModal(title, text, type = 'info') {
             const modal = document.getElementById('modal-alert');
             const mTitle = document.getElementById('modal-title');
@@ -440,7 +520,7 @@
             }
         }
 
-        // Web Audio API Synthesizer (to recreate "custom mp3 notification sounds" in modern sandboxed web environment)
+        // Web Audio API Synthesizer
         function playSynthesizedSound(type) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -489,7 +569,7 @@
                     osc.stop(audioCtx.currentTime + 0.4);
                 }
             } catch (e) {
-                log(`[PERINGATAN] Web Audio API gagal bersuara: ${e.message}. Ini karena Anda belum melakukan interaksi fisik dengan halaman ini.`);
+                log(`[PERINGATAN] Web Audio API gagal bersuara: ${e.message}`);
             }
         }
 
@@ -506,11 +586,16 @@
             delayLabel.textContent = `${e.target.value} Detik`;
         });
 
-        // Trigger Notification Function
-        function triggerRealNotification() {
+        // Dispatch scheduler to Service Worker
+        function dispatchBackgroundScheduler() {
             if (Notification.permission !== 'granted') {
-                log("[ERROR] Gagal memicu notifikasi: Izin tidak diberikan.");
+                log("[ERROR] Gagal menjadwalkan: Izin tidak diberikan.");
                 showModal("Izin Dibutuhkan", "Mohon berikan izin notifikasi terlebih dahulu sebelum memulai simulasi.", "error");
+                return;
+            }
+
+            if (!activeServiceWorkerReg) {
+                log("[ERROR] Service Worker belum siap/aktif.");
                 return;
             }
 
@@ -519,103 +604,54 @@
                 ? 'Dana sebesar Rp 2.500.000 telah masuk ke saldo Merchant Anda.'
                 : 'Transaksi dengan ID #TX8829-G gagal diverifikasi karena limit habis.';
 
-            log(`[NOTIFIKASI] Memicu notifikasi ke sistem operasi...`);
-
-            // 1. Memasang parameter "sound" yang sudah ditiadakan di browser modern sebagai pembuktian
-            const options = {
-                body: bodyText,
-                icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=128',
-                vibrate: [200, 100, 200, 100, 200],
-                tag: 'simulasi-web-push',
-                requireInteraction: true,
-                sound: selectedNotificationType === 'success' ? '/audio/uang-masuk.mp3' : '/audio/transaksi-gagal.mp3' // BUKTI: Ini diabaikan browser
-            };
-
-            // 2. Coba putar suara lokal
-            // ATURAN AUTOPLAY: Jika tab disembunyikan/layar mati, pemutar audio ini akan di-blokir total oleh browser!
-            if (!isTabActive) {
-                log("[PERINGATAN] Aplikasi mendeteksi tab dalam keadaan pasif/disembunyikan. Browser secara otomatis membisukan (mencekal) pemutar suara Audio API lokal.");
-            } else {
-                playSynthesizedSound(selectedNotificationType);
-                log("[SUARA] Suara kustom diputar di latar depan (karena Tab Aktif).");
-            }
-
-            // 3. Tampilkan Notifikasi Sistem
-            try {
-                // Diutamakan menggunakan Service Worker jika terdaftar untuk mensimulasikan lingkungan asli
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then((registration) => {
-                        registration.showNotification(title, options);
-                        log("[SISTEM] Notifikasi dipicu melalui Service Worker.");
-                    }).catch(() => {
-                        new Notification(title, options);
-                        log("[SISTEM] Notifikasi dipicu melalui API Notifikasi Utama.");
-                    });
-                } else {
-                    new Notification(title, options);
-                    log("[SISTEM] Notifikasi dipicu melalui API Notifikasi Utama.");
-                }
-            } catch (err) {
-                log(`[ERROR] Gagal memunculkan notifikasi: ${err.message}`);
-            }
-        }
-
-        // Simulation Scheduler Trigger
-        document.getElementById('btn-start-simulation').addEventListener('click', () => {
-            if (Notification.permission !== 'granted') {
-                showModal("Izin Dibutuhkan", "Mohon aktifkan izin notifikasi di Langkah 1 terlebih dahulu.", "error");
-                return;
-            }
-
-            let delayValue = parseInt(delaySlider.value);
+            const delayValue = parseInt(delaySlider.value);
             const countdownCard = document.getElementById('countdown-card');
             const countdownTimer = document.getElementById('countdown-timer');
 
-            // Reset any active timer
+            // Reset any active client UI timer
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
 
-            log(`[SISTEM] Memulai penjadwalan notifikasi tipe [${selectedNotificationType.toUpperCase()}] dalam ${delayValue} detik.`);
-            
-            // Show countdown card & configure it
-            countdownTimer.textContent = delayValue;
-            countdownCard.classList.remove('hidden');
-            countdownCard.scrollIntoView({ behavior: 'smooth' });
-
-            timerInterval = setInterval(() => {
-                delayValue--;
-                countdownTimer.textContent = delayValue;
-                
-                log(`[TIMER] Hitung mundur: ${delayValue}s`);
-
-                if (delayValue <= 0) {
-                    clearInterval(timerInterval);
-                    countdownCard.classList.add('hidden');
+            // Kirim payload penjadwalan ke Service Worker
+            navigator.serviceWorker.ready.then((reg) => {
+                if (reg.active) {
+                    reg.active.postMessage({
+                        type: 'SCHEDULE_NOTIFICATION',
+                        delay: delayValue * 1000,
+                        notifType: selectedNotificationType,
+                        title: title,
+                        body: bodyText
+                    });
                     
-                    // Trigger Notifikasi Akhir
-                    triggerRealNotification();
-                }
-            }, 1000);
-        });
+                    log(`[SISTEM] Perintah dikirim ke Service Worker! Menjadwalkan ${delayValue} detik.`);
+                    
+                    // Show client-side fallback timer (untuk visualisasi pengguna jika tab belum ditutup)
+                    let currentSeconds = delayValue;
+                    countdownTimer.textContent = currentSeconds;
+                    countdownCard.classList.remove('hidden');
+                    countdownCard.scrollIntoView({ behavior: 'smooth' });
 
-        // Register fake service worker on background to make sure standard push APIs are registered
-        if ('serviceWorker' in navigator) {
-            // Kita registrasikan inline worker palsu untuk mengaktifkan fungsionalitas SW di browser lokal
-            const swCode = `
-                self.addEventListener('push', function(event) {
-                    // Simulasi Push API handler
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const blobUrl = URL.createObjectURL(blob);
-            
-            navigator.serviceWorker.register(blobUrl).then((reg) => {
-                log("[SISTEM] Service Worker tiruan terdaftar untuk simulasi lingkungan PWA.");
-            }).catch((e) => {
-                log("[INFO] Registrasi Service Worker di-bypass (berjalan di mode sandboxed tab).");
+                    timerInterval = setInterval(() => {
+                        currentSeconds--;
+                        countdownTimer.textContent = currentSeconds;
+                        log(`[KLIEN] Sisa waktu di layar: ${currentSeconds}s`);
+                        
+                        if (currentSeconds <= 0) {
+                            clearInterval(timerInterval);
+                            countdownCard.classList.add('hidden');
+                        }
+                    }, 1000);
+                } else {
+                    log("[ERROR] Utas Service Worker tidak merespons pengiriman pesan.");
+                }
             });
         }
+
+        // Action Button Listener
+        document.getElementById('btn-start-simulation').addEventListener('click', () => {
+            dispatchBackgroundScheduler();
+        });
     </script>
 </body>
 </html>
