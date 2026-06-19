@@ -1,0 +1,1241 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent}
+:root{--c-bg:var(--color-background-primary);--c-bg2:var(--color-background-secondary);--c-text:var(--color-text-primary);--c-muted:var(--color-text-secondary);--c-border:var(--color-border-tertiary);--c-accent:#534AB7;--c-accent-l:#EEEDFE;--c-green:#3B6D11;--c-green-l:#EAF3DE;--c-amber:#854F0B;--c-amber-l:#FAEEDA;--c-red:#A32D2D;--c-red-l:#FCEBEB;--c-teal:#0F6E56;--c-teal-l:#E1F5EE;--c-coral:#993C1D;--c-coral-l:#FAECE7}
+
+#app{display:flex;height:640px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+
+#sidebar{width:220px;min-width:220px;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);display:flex;flex-direction:column;overflow:hidden}
+#sidebar-header{padding:14px 16px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+#sidebar-header h2{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.06em}
+#sidebar-header p{font-size:12px;color:var(--color-text-tertiary);margin-top:2px}
+#chapters{flex:1;overflow-y:auto;padding:8px 0}
+.chap-group{margin-bottom:2px}
+.chap-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 2px;text-transform:uppercase;letter-spacing:0.07em}
+.chap-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-radius:0;transition:background 0.1s;border-left:2px solid transparent;line-height:1.3}
+.chap-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.chap-item.active{background:var(--color-background-primary);color:#534AB7;border-left-color:#534AB7;font-weight:500}
+.chap-item .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:0.5}
+.chap-item.active .dot{opacity:1}
+.badge-lvl{font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;margin-left:auto}
+.b-basic{background:#EAF3DE;color:#3B6D11}
+.b-mid{background:#FAEEDA;color:#854F0B}
+.b-adv{background:#FAECE7;color:#993C1D}
+.b-pro{background:#EEEDFE;color:#534AB7}
+
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0}
+#chapter-title{font-size:15px;font-weight:500;color:var(--color-text-primary);flex:1}
+#chapter-badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+
+#chat-area{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+
+.msg{display:flex;gap:10px;max-width:100%}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.avatar.bot{background:#EEEDFE;color:#534AB7}
+.avatar.usr{background:#E1F5EE;color:#0F6E56}
+.bubble{max-width:calc(100% - 80px);padding:10px 14px;border-radius:12px;font-size:13.5px;line-height:1.65;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.msg.user .bubble{background:var(--color-background-secondary);border-color:var(--color-border-tertiary)}
+.bubble code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);font-size:12px;color:#534AB7}
+.bubble pre{background:#1e1e2e;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0;border:0.5px solid rgba(255,255,255,0.08)}
+.bubble pre code{background:none;border:none;padding:0;color:#cdd6f4;font-size:12px;font-family:var(--font-mono)}
+.bubble .kw{color:#89b4fa}
+.bubble .cm{color:#6c7086}
+.bubble .st{color:#a6e3a1}
+.bubble .num{color:#fab387}
+.bubble .tip{background:#EEEDFE;border-left:3px solid #534AB7;border-radius:4px;padding:8px 12px;margin:8px 0;font-size:13px}
+.bubble .warn{background:#FAEEDA;border-left:3px solid #EF9F27;border-radius:4px;padding:8px 12px;margin:8px 0;font-size:13px}
+.bubble .danger{background:#FCEBEB;border-left:3px solid #E24B4A;border-radius:4px;padding:8px 12px;margin:8px 0;font-size:13px}
+.bubble .success{background:#EAF3DE;border-left:3px solid #639922;border-radius:4px;padding:8px 12px;margin:8px 0;font-size:13px}
+.bubble h4{font-size:13px;font-weight:500;margin:10px 0 4px;color:var(--color-text-primary)}
+.bubble ul{padding-left:18px;margin:4px 0}
+.bubble li{margin:3px 0;font-size:13.5px}
+.bubble table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}
+.bubble th{background:var(--color-background-secondary);padding:6px 10px;text-align:left;border:0.5px solid var(--color-border-tertiary);font-weight:500}
+.bubble td{padding:6px 10px;border:0.5px solid var(--color-border-tertiary);font-family:var(--font-mono);font-size:12px}
+
+.quick-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;color:var(--color-text-primary);transition:all 0.15s}
+.qb:hover{border-color:#534AB7;color:#534AB7;background:#EEEDFE}
+
+#input-area{padding:12px 18px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;flex-shrink:0}
+#user-input{flex:1;border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:9px 12px;font-size:13.5px;font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary);outline:none;resize:none;height:40px}
+#user-input:focus{border-color:#534AB7}
+#send-btn{background:#534AB7;color:white;border:none;border-radius:8px;padding:0 16px;cursor:pointer;font-size:13px;font-weight:500;transition:opacity 0.15s;flex-shrink:0}
+#send-btn:hover{opacity:0.85}
+#send-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+.typing{display:flex;gap:4px;padding:4px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:#534AB7;opacity:0.4;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+
+.progress-bar{height:2px;background:#EEEDFE;position:relative;flex-shrink:0}
+.progress-fill{height:100%;background:#534AB7;transition:width 0.3s}
+
+#mobile-menu{display:none}
+@media(max-width:600px){
+  #sidebar{display:none;position:absolute;z-index:10;height:100%;box-shadow:2px 0 8px rgba(0,0,0,0.15)}
+  #sidebar.open{display:flex}
+  #mobile-menu{display:flex;align-items:center;justify-content:center;width:32px;height:32px;cursor:pointer;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+  #app{position:relative}
+}
+</style>
+
+<h2 class="sr-only">Git Master — Buku Interaktif Komprehensif. Pilih bab dari sidebar dan chat dengan tutor AI untuk belajar Git dari dasar hingga tingkat lanjut.</h2>
+
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h2>Git Master</h2>
+      <p>Klik bab → tanya apa saja</p>
+    </div>
+    <div id="chapters">
+      <div class="chap-group">
+        <div class="chap-label">Dasar</div>
+        <div class="chap-item active" data-chap="0"><div class="dot"></div>Apa itu Git?<span class="badge-lvl b-basic">Basic</span></div>
+        <div class="chap-item" data-chap="1"><div class="dot"></div>Install & Config<span class="badge-lvl b-basic">Basic</span></div>
+        <div class="chap-item" data-chap="2"><div class="dot"></div>Init, Add, Commit<span class="badge-lvl b-basic">Basic</span></div>
+        <div class="chap-item" data-chap="3"><div class="dot"></div>Status & Log<span class="badge-lvl b-basic">Basic</span></div>
+      </div>
+      <div class="chap-group">
+        <div class="chap-label">Menengah</div>
+        <div class="chap-item" data-chap="4"><div class="dot"></div>Branching<span class="badge-lvl b-mid">Mid</span></div>
+        <div class="chap-item" data-chap="5"><div class="dot"></div>Merging<span class="badge-lvl b-mid">Mid</span></div>
+        <div class="chap-item" data-chap="6"><div class="dot"></div>Remote & GitHub<span class="badge-lvl b-mid">Mid</span></div>
+        <div class="chap-item" data-chap="7"><div class="dot"></div>Stash & Tag<span class="badge-lvl b-mid">Mid</span></div>
+        <div class="chap-item" data-chap="8"><div class="dot"></div>Diff & Undoing<span class="badge-lvl b-mid">Mid</span></div>
+      </div>
+      <div class="chap-group">
+        <div class="chap-label">Lanjutan</div>
+        <div class="chap-item" data-chap="9"><div class="dot"></div>Rebase<span class="badge-lvl b-adv">Adv</span></div>
+        <div class="chap-item" data-chap="10"><div class="dot"></div>Cherry-pick<span class="badge-lvl b-adv">Adv</span></div>
+        <div class="chap-item" data-chap="11"><div class="dot"></div>Reflog & Recovery<span class="badge-lvl b-adv">Adv</span></div>
+        <div class="chap-item" data-chap="12"><div class="dot"></div>Git Hooks<span class="badge-lvl b-adv">Adv</span></div>
+        <div class="chap-item" data-chap="13"><div class="dot"></div>Submodule<span class="badge-lvl b-adv">Adv</span></div>
+      </div>
+      <div class="chap-group">
+        <div class="chap-label">Pro / Master</div>
+        <div class="chap-item" data-chap="14"><div class="dot"></div>Git Internals<span class="badge-lvl b-pro">Pro</span></div>
+        <div class="chap-item" data-chap="15"><div class="dot"></div>Rewrite History<span class="badge-lvl b-pro">Pro</span></div>
+        <div class="chap-item" data-chap="16"><div class="dot"></div>Workflows & CI/CD<span class="badge-lvl b-pro">Pro</span></div>
+        <div class="chap-item" data-chap="17"><div class="dot"></div>Advanced Tricks<span class="badge-lvl b-pro">Pro</span></div>
+        <div class="chap-item" data-chap="18"><div class="dot"></div>Troubleshooting<span class="badge-lvl b-pro">Pro</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:5%"></div></div>
+    <div id="topbar">
+      <div id="mobile-menu" onclick="toggleSidebar()" aria-label="Menu"><i class="ti ti-menu-2" style="font-size:18px" aria-hidden="true"></i></div>
+      <div id="chapter-title">Bab 1 — Apa itu Git?</div>
+      <div id="chapter-badge" class="badge-lvl b-basic">Basic</div>
+    </div>
+    <div id="chat-area"></div>
+    <div id="input-area">
+      <textarea id="user-input" placeholder="Tanya tentang topik ini... (Enter kirim, Shift+Enter baris baru)" rows="1"></textarea>
+      <button id="send-btn" onclick="sendMsg()"><i class="ti ti-send" aria-hidden="true"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHAPTERS = [
+  {
+    title:"Bab 1 — Apa itu Git?",badge:"Basic",badgeClass:"b-basic",
+    intro:`<b>Selamat datang di Git Master! 🚀</b>
+
+Git adalah <b>sistem version control terdistribusi</b> (Distributed Version Control System / DVCS) yang dibuat oleh <b>Linus Torvalds</b> pada 2005 untuk mengelola kode kernel Linux.
+
+<h4>Mengapa Git penting?</h4>
+<ul>
+<li>Melacak setiap perubahan file secara detail</li>
+<li>Memungkinkan kolaborasi tim tanpa konflik</li>
+<li>Bisa "time travel" ke versi kode manapun</li>
+<li>Setiap developer punya salinan penuh (distributed)</li>
+</ul>
+
+<h4>Git vs Version Control lainnya</h4>
+
+<table>
+<tr><th>Fitur</th><th>Git</th><th>SVN (old)</th></tr>
+<tr><td>Arsitektur</td><td>Distributed</td><td>Centralized</td></tr>
+<tr><td>Offline kerja</td><td>✅ Ya</td><td>❌ Tidak</td></tr>
+<tr><td>Branching</td><td>Sangat cepat</td><td>Lambat</td></tr>
+<tr><td>Populer</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐</td></tr>
+</table>
+
+<div class="tip">💡 <b>Konsep kunci:</b> Git menyimpan <i>snapshot</i> (foto) dari seluruh proyek, bukan hanya diff/perubahan. Inilah yang membuatnya sangat cepat.</div>
+
+Mau tanya apa tentang Git dan konsep dasarnya?`,
+    quickBtns:["Apa bedanya Git dan GitHub?","Bagaimana Git menyimpan data?","Kenapa harus pakai Git?","Apa itu repository?"]
+  },
+  {
+    title:"Bab 2 — Install & Config",badge:"Basic",badgeClass:"b-basic",
+    intro:`<b>Install Git & Konfigurasi Awal</b>
+
+<h4>Install Git</h4>
+<pre><code><span class="cm"># macOS (via Homebrew)</span>
+brew install git
+
+<span class="cm"># Ubuntu/Debian</span>
+sudo apt install git
+
+<span class="cm"># Windows</span>
+<span class="cm"># Download dari https://git-scm.com/download/win</span>
+
+<span class="cm"># Cek versi</span>
+git --version</code></pre>
+
+<h4>Konfigurasi Wajib (Pertama Kali)</h4>
+<pre><code><span class="cm"># Identitas kamu — WAJIB sebelum commit!</span>
+git config --global user.name <span class="st">"Nama Kamu"</span>
+git config --global user.email <span class="st">"email@kamu.com"</span>
+
+<span class="cm"># Editor default (pakai VS Code)</span>
+git config --global core.editor <span class="st">"code --wait"</span>
+
+<span class="cm"># Default branch name (modern: main)</span>
+git config --global init.defaultBranch main
+
+<span class="cm"># Cek semua config</span>
+git config --list</code></pre>
+
+<h4>Level Config Git</h4>
+<ul>
+<li><code>--system</code> → berlaku untuk semua user di komputer</li>
+<li><code>--global</code> → berlaku untuk semua repo milikmu</li>
+<li><code>--local</code> → berlaku hanya untuk repo aktif (default)</li>
+</ul>
+
+<div class="tip">💡 Config disimpan di <code>~/.gitconfig</code> (global) dan <code>.git/config</code> (local).</div>`,
+    quickBtns:["Setup SSH key untuk GitHub","Cara config beda user per repo","Apa itu .gitconfig?","Setup alias git yang berguna"]
+  },
+  {
+    title:"Bab 3 — Init, Add, Commit",badge:"Basic",badgeClass:"b-basic",
+    intro:`<b>The Core Workflow: Snapshot ke History</b>
+
+<h4>3 Area Penting Git</h4>
+<pre><code>Working Directory → Staging Area → Repository
+   (edit file)       (git add)     (git commit)</code></pre>
+
+<div class="tip">Bayangkan: <b>Working Dir</b> = meja kerja, <b>Staging</b> = amplop surat, <b>Repo</b> = arsip permanen.</div>
+
+<h4>Workflow Dasar</h4>
+<pre><code><span class="cm"># 1. Buat repo baru</span>
+mkdir my-project && cd my-project
+git init
+
+<span class="cm"># 2. Buat file</span>
+echo <span class="st">"Hello World"</span> > index.html
+
+<span class="cm"># 3. Tambah ke staging</span>
+git add index.html      <span class="cm"># file spesifik</span>
+git add .               <span class="cm"># semua file</span>
+git add *.js            <span class="cm"># pattern</span>
+git add -p              <span class="cm"># pilih baris per baris (interaktif!)</span>
+
+<span class="cm"># 4. Commit</span>
+git commit -m <span class="st">"feat: add homepage"</span>
+git commit -am <span class="st">"fix: update content"</span>  <span class="cm"># add+commit sekaligus (tracked files)</span></code></pre>
+
+<h4>Menulis Commit Message yang Baik</h4>
+<pre><code><span class="cm"># Format Conventional Commits (industri standar)</span>
+feat: tambah fitur login
+fix: perbaiki bug pagination
+docs: update README
+refactor: pisah fungsi auth
+test: tambah unit test untuk user
+chore: update dependencies</code></pre>
+
+<div class="warn">⚠️ Commit message yang buruk: "fix", "update", "aaa", "asdfgh". Ini akan menyulitkan debugging di masa depan!</div>`,
+    quickBtns:["Apa itu staging area dan kenapa perlu?","Cara unstage file","Commit amend itu apa?","Cara commit hanya sebagian baris?"]
+  },
+  {
+    title:"Bab 4 — Status & Log",badge:"Basic",badgeClass:"b-basic",
+    intro:`<b>Melihat Kondisi dan Riwayat Repo</b>
+
+<h4>git status — Kondisi saat ini</h4>
+<pre><code>git status          <span class="cm"># detail lengkap</span>
+git status -s       <span class="cm"># short/ringkas</span>
+git status -sb      <span class="cm"># short + info branch</span></code></pre>
+
+<h4>git log — Riwayat commit</h4>
+<pre><code><span class="cm"># Dasar</span>
+git log
+git log --oneline             <span class="cm"># 1 baris per commit</span>
+git log --oneline --graph     <span class="cm"># visualisasi branch</span>
+git log --oneline --all       <span class="cm"># semua branch</span>
+
+<span class="cm"># Filter canggih</span>
+git log --author=<span class="st">"Nama"</span>
+git log --since=<span class="st">"2 weeks ago"</span>
+git log --until=<span class="st">"2024-01-01"</span>
+git log --grep=<span class="st">"feat:"</span>         <span class="cm"># cari di commit message</span>
+git log -p                    <span class="cm"># tampilkan diff tiap commit</span>
+git log -n 5                  <span class="cm"># hanya 5 commit terakhir</span>
+git log -- src/auth.js        <span class="cm"># log file spesifik</span>
+
+<span class="cm"># Format custom (powerful!)</span>
+git log --pretty=format:<span class="st">"%h | %an | %ar | %s"</span></code></pre>
+
+<div class="success">✅ <b>Pro tip:</b> Buat alias <code>git lg</code> = <code>git log --oneline --graph --all --decorate</code> — ini sangat berguna setiap hari!</div>
+
+<h4>Melihat isi commit tertentu</h4>
+<pre><code>git show abc1234          <span class="cm"># isi commit by hash</span>
+git show HEAD             <span class="cm"># commit terakhir</span>
+git show HEAD~2           <span class="cm"># 2 commit sebelumnya</span></code></pre>`,
+    quickBtns:["Cara buat alias git lg","Apa arti HEAD?","Cara cari commit yang hapus suatu baris?","Cara lihat siapa yang ubah baris tertentu?"]
+  },
+  {
+    title:"Bab 5 — Branching",badge:"Mid",badgeClass:"b-mid",
+    intro:`<b>Branching — Superpower Git yang Sesungguhnya</b>
+
+Branch = pointer ringan ke sebuah commit. Membuat branch baru hampir instan!
+
+<h4>Operasi Branch Dasar</h4>
+<pre><code><span class="cm"># Melihat branch</span>
+git branch              <span class="cm"># lokal</span>
+git branch -r           <span class="cm"># remote</span>
+git branch -a           <span class="cm"># semua</span>
+git branch -v           <span class="cm"># + info commit terakhir</span>
+
+<span class="cm"># Buat & pindah branch</span>
+git branch feature/login        <span class="cm"># buat saja</span>
+git checkout feature/login      <span class="cm"># pindah</span>
+git checkout -b feature/login   <span class="cm"># buat + pindah (shortcut!)</span>
+git switch -c feature/login     <span class="cm"># cara modern (git 2.23+)</span>
+
+<span class="cm"># Hapus branch</span>
+git branch -d feature/login     <span class="cm"># aman (cek merge dulu)</span>
+git branch -D feature/login     <span class="cm"># paksa hapus</span>
+
+<span class="cm"># Rename branch</span>
+git branch -m old-name new-name</code></pre>
+
+<h4>Real Case: Feature Branch Workflow</h4>
+<pre><code><span class="cm"># Selalu buat branch dari main yang fresh</span>
+git switch main
+git pull origin main
+git switch -c feature/user-auth
+
+<span class="cm"># Kerja di branch ini...</span>
+git add . && git commit -m <span class="st">"feat: add login form"</span>
+git add . && git commit -m <span class="st">"feat: add JWT validation"</span>
+
+<span class="cm"># Push branch ke remote</span>
+git push -u origin feature/user-auth</code></pre>
+
+<div class="tip">💡 Konvensi nama branch yang baik: <code>feature/nama-fitur</code>, <code>fix/bug-description</code>, <code>hotfix/critical-bug</code>, <code>release/v1.2.0</code></div>`,
+    quickBtns:["Apa itu HEAD detached?","Cara lihat branch mana yang sudah di-merge?","Strategi penamaan branch di tim","Cara track remote branch"]
+  },
+  {
+    title:"Bab 6 — Merging",badge:"Mid",badgeClass:"b-mid",
+    intro:`<b>Merging — Menggabungkan Pekerjaan</b>
+
+<h4>Tipe Merge</h4>
+<pre><code><span class="cm"># Fast-forward merge (linear history)</span>
+git switch main
+git merge feature/login     <span class="cm"># jika tidak ada divergence</span>
+
+<span class="cm"># 3-way merge (buat merge commit)</span>
+git merge --no-ff feature/login   <span class="cm"># paksa buat merge commit</span>
+git merge --no-ff -m <span class="st">"merge: feature user login"</span> feature/login
+
+<span class="cm"># Squash merge (gabung jadi 1 commit)</span>
+git merge --squash feature/login
+git commit -m <span class="st">"feat: complete user login feature"</span></code></pre>
+
+<h4>Menangani Merge Conflict</h4>
+<pre><code><span class="cm"># Saat conflict terjadi, Git menandai file:</span>
+<<<<<<< HEAD
+console.log(<span class="st">"versi kamu"</span>)
+=======
+console.log(<span class="st">"versi mereka"</span>)
+>>>>>>> feature/login
+
+<span class="cm"># Setelah edit manual dan pilih versi yang benar:</span>
+git add file-yang-conflict.js
+git commit   <span class="cm"># git auto-generate message</span>
+
+<span class="cm"># Atau batalkan merge</span>
+git merge --abort</code></pre>
+
+<div class="warn">⚠️ <b>Gunakan merge tool visual:</b> <code>git mergetool</code> atau VS Code (lebih mudah dari edit manual)</div>
+
+<h4>Cek sebelum merge</h4>
+<pre><code>git diff main..feature/login          <span class="cm"># lihat perbedaan</span>
+git log main..feature/login --oneline <span class="cm"># commit yang akan masuk</span></code></pre>`,
+    quickBtns:["Kapan pakai FF vs no-FF vs squash?","Cara resolve conflict dengan VS Code","Apa itu octopus merge?","Cara merge hanya file tertentu?"]
+  },
+  {
+    title:"Bab 7 — Remote & GitHub",badge:"Mid",badgeClass:"b-mid",
+    intro:`<b>Bekerja dengan Remote Repository</b>
+
+<h4>Setup Remote</h4>
+<pre><code><span class="cm"># Lihat remote yang ada</span>
+git remote -v
+
+<span class="cm"># Tambah remote</span>
+git remote add origin https://github.com/user/repo.git
+git remote add upstream https://github.com/original/repo.git
+
+<span class="cm"># Ganti URL remote</span>
+git remote set-url origin git@github.com:user/repo.git</code></pre>
+
+<h4>Push, Pull, Fetch</h4>
+<pre><code><span class="cm"># Push</span>
+git push origin main                  <span class="cm"># push branch main</span>
+git push -u origin feature/login      <span class="cm"># push + set upstream</span>
+git push --force-with-lease           <span class="cm"># force push yang AMAN</span>
+git push origin --delete old-branch   <span class="cm"># hapus remote branch</span>
+
+<span class="cm"># Fetch (download tanpa merge)</span>
+git fetch origin          <span class="cm"># ambil semua update remote</span>
+git fetch --prune         <span class="cm"># + hapus ref branch yg sudah dihapus</span>
+
+<span class="cm"># Pull (fetch + merge/rebase)</span>
+git pull origin main
+git pull --rebase origin main   <span class="cm"># pull dengan rebase (lebih clean)</span></code></pre>
+
+<h4>Clone</h4>
+<pre><code>git clone https://github.com/user/repo.git
+git clone --depth 1 https://... mydir  <span class="cm"># shallow clone (cepat!)</span>
+git clone --branch develop https://... <span class="cm"># clone branch tertentu</span></code></pre>
+
+<div class="danger">🚨 Jangan pernah <code>git push --force</code> ke branch shared/main! Gunakan <code>--force-with-lease</code> untuk keamanan.</div>`,
+    quickBtns:["Cara setup SSH key GitHub","Apa bedanya fetch dan pull?","Cara fork dan pull request workflow","Cara sync fork dengan upstream"]
+  },
+  {
+    title:"Bab 8 — Stash & Tag",badge:"Mid",badgeClass:"b-mid",
+    intro:`<b>Stash: Simpan Sementara & Tag: Penanda Rilis</b>
+
+<h4>Git Stash — Simpan Pekerjaan Setengah Jalan</h4>
+<pre><code><span class="cm"># Simpan perubahan ke stash</span>
+git stash                         <span class="cm"># stash biasa</span>
+git stash push -m <span class="st">"WIP: form login"</span>  <span class="cm"># dengan nama</span>
+git stash push -u                 <span class="cm"># include untracked files</span>
+git stash push -p                 <span class="cm"># pilih baris (interaktif)</span>
+
+<span class="cm"># Lihat daftar stash</span>
+git stash list
+git stash show stash@{0} -p   <span class="cm"># lihat isi stash</span>
+
+<span class="cm"># Ambil kembali stash</span>
+git stash pop             <span class="cm"># ambil + hapus dari stash</span>
+git stash apply stash@{1} <span class="cm"># ambil tanpa hapus</span>
+git stash drop stash@{0}  <span class="cm"># hapus stash</span>
+git stash clear           <span class="cm"># hapus semua stash</span>
+
+<span class="cm"># Buat branch dari stash</span>
+git stash branch feature/baru stash@{0}</code></pre>
+
+<h4>Git Tag — Penanda Versi Rilis</h4>
+<pre><code><span class="cm"># Buat tag</span>
+git tag v1.0.0                          <span class="cm"># lightweight tag</span>
+git tag -a v1.0.0 -m <span class="st">"Release v1.0.0"</span>  <span class="cm"># annotated (recommended!)</span>
+git tag -a v1.0.0 abc1234               <span class="cm"># tag commit tertentu</span>
+
+<span class="cm"># Lihat & push tag</span>
+git tag -l
+git tag -l <span class="st">"v1.*"</span>         <span class="cm"># filter</span>
+git push origin v1.0.0    <span class="cm"># push satu tag</span>
+git push origin --tags    <span class="cm"># push semua tag</span>
+
+<span class="cm"># Hapus tag</span>
+git tag -d v1.0.0
+git push origin --delete v1.0.0</code></pre>
+
+<div class="tip">💡 Pakai <b>Semantic Versioning</b>: <code>MAJOR.MINOR.PATCH</code> — contoh: <code>v2.1.3</code></div>`,
+    quickBtns:["Real case penggunaan stash","Bedanya lightweight vs annotated tag","Cara checkout ke tag tertentu","Cara stash hanya file tertentu"]
+  },
+  {
+    title:"Bab 9 — Diff & Undoing",badge:"Mid",badgeClass:"b-mid",
+    intro:`<b>Melihat Perbedaan & Membatalkan Perubahan</b>
+
+<h4>Git Diff</h4>
+<pre><code>git diff                    <span class="cm"># working dir vs staging</span>
+git diff --staged           <span class="cm"># staging vs last commit</span>
+git diff HEAD               <span class="cm"># working dir vs last commit</span>
+git diff main..feature/x    <span class="cm"># antar branch</span>
+git diff abc123..def456     <span class="cm"># antar commit</span>
+git diff --stat             <span class="cm"># ringkasan saja</span>
+git diff -- src/auth.js     <span class="cm"># file spesifik</span></code></pre>
+
+<h4>Undoing Changes — Sangat Penting!</h4>
+<pre><code><span class="cm">## LEVEL 1: Batalkan perubahan di working directory</span>
+git restore file.js            <span class="cm"># buang edit (git 2.23+)</span>
+git checkout -- file.js        <span class="cm"># cara lama</span>
+git restore .                  <span class="cm"># buang semua edit</span>
+
+<span class="cm">## LEVEL 2: Unstage file</span>
+git restore --staged file.js   <span class="cm"># keluarkan dari staging</span>
+git reset HEAD file.js         <span class="cm"># cara lama</span>
+
+<span class="cm">## LEVEL 3: Undo commit (AMAN — buat commit baru)</span>
+git revert HEAD                <span class="cm"># balik commit terakhir</span>
+git revert abc1234             <span class="cm"># balik commit tertentu</span>
+git revert HEAD~3..HEAD        <span class="cm"># balik range commit</span>
+
+<span class="cm">## LEVEL 4: Reset (HATI-HATI!)</span>
+git reset --soft HEAD~1   <span class="cm"># undo commit, simpan di staging</span>
+git reset --mixed HEAD~1  <span class="cm"># undo commit, simpan di working dir</span>
+git reset --hard HEAD~1   <span class="cm"># undo commit + hapus perubahan ⚠️</span></code></pre>
+
+<div class="danger">🚨 <code>git reset --hard</code> menghapus perubahan permanen dari working directory. Tapi masih bisa dipulihkan via <code>git reflog</code> selama belum di-garbage collect!</div>`,
+    quickBtns:["Kapan pakai revert vs reset?","Cara pulihkan file yang terhapus?","git clean itu apa?","Cara lihat diff dengan tool visual?"]
+  },
+  {
+    title:"Bab 10 — Rebase",badge:"Adv",badgeClass:"b-adv",
+    intro:`<b>Rebase — Menulis Ulang History untuk History yang Bersih</b>
+
+<h4>Apa itu Rebase?</h4>
+<pre><code><span class="cm"># Sebelum rebase:</span>
+main:    A---B---C
+               \
+feature:        D---E
+
+<span class="cm"># Setelah: git rebase main (dari branch feature)</span>
+main:    A---B---C
+                 \
+feature:          D'--E'   <span class="cm"># D, E di-"replay" ulang</span></code></pre>
+
+<h4>Rebase Dasar</h4>
+<pre><code><span class="cm"># Rebase branch feature ke atas main</span>
+git switch feature/login
+git rebase main
+
+<span class="cm"># Saat ada conflict saat rebase:</span>
+<span class="cm"># 1. Fix conflict</span>
+<span class="cm"># 2. git add file-yang-fix</span>
+<span class="cm"># 3. git rebase --continue</span>
+<span class="cm"># Atau batalkan:</span>
+git rebase --abort</code></pre>
+
+<h4>Interactive Rebase — Killer Feature!</h4>
+<pre><code><span class="cm"># Rewrite 5 commit terakhir secara interaktif</span>
+git rebase -i HEAD~5
+
+<span class="cm"># Opsi di editor:</span>
+<span class="kw">pick</span>   abc123 feat: add login    <span class="cm"># pakai apa adanya</span>
+<span class="kw">reword</span> def456 fix: typo          <span class="cm"># ubah message</span>
+<span class="kw">squash</span> ghi789 WIP               <span class="cm"># gabung ke commit sebelumnya</span>
+<span class="kw">fixup</span>  jkl012 minor fix         <span class="cm"># squash tapi buang message</span>
+<span class="kw">drop</span>   mno345 debug log         <span class="cm"># hapus commit ini</span>
+<span class="kw">edit</span>   pqr678 feat: auth        <span class="cm"># pause untuk edit</span></code></pre>
+
+<div class="danger">🚨 <b>Golden Rule:</b> Jangan rebase branch yang sudah di-push ke shared/main remote! Ini akan merusak history tim. Rebase aman hanya untuk branch lokal/personal.</div>
+
+<div class="tip">💡 <b>Rebase vs Merge:</b> Rebase = history linear bersih, Merge = history akurat mencerminkan timeline nyata. Tim berbeda punya preferensi berbeda.</div>`,
+    quickBtns:["Rebase vs Merge: kapan pakai mana?","Cara squash semua commit jadi satu","Pull --rebase itu bedanya apa?","Cara rebase ke branch lain bukan main"]
+  },
+  {
+    title:"Bab 11 — Cherry-pick",badge:"Adv",badgeClass:"b-adv",
+    intro:`<b>Cherry-pick — Ambil Commit Tertentu Saja</b>
+
+Cherry-pick = ambil 1 atau beberapa commit dari branch lain dan terapkan ke branch aktif.
+
+<h4>Penggunaan Cherry-pick</h4>
+<pre><code><span class="cm"># Ambil 1 commit</span>
+git cherry-pick abc1234
+
+<span class="cm"># Ambil beberapa commit</span>
+git cherry-pick abc1234 def5678
+
+<span class="cm"># Ambil range commit (inklusif)</span>
+git cherry-pick abc1234^..def5678
+
+<span class="cm"># Cherry-pick tapi JANGAN langsung commit</span>
+git cherry-pick --no-commit abc1234
+<span class="cm"># (berguna untuk edit dulu sebelum commit)</span>
+
+<span class="cm"># Jika ada conflict:</span>
+<span class="cm"># Fix conflict → git add → git cherry-pick --continue</span>
+<span class="cm"># Atau batalkan:</span>
+git cherry-pick --abort</code></pre>
+
+<h4>Real Case Cherry-pick</h4>
+<pre><code><span class="cm">## CASE 1: Hotfix perlu di-apply ke beberapa branch</span>
+<span class="cm"># Fix ada di commit abc1234 di branch hotfix</span>
+git switch release/v1.0
+git cherry-pick abc1234   <span class="cm"># apply fix ke v1.0</span>
+git switch release/v2.0
+git cherry-pick abc1234   <span class="cm"># apply juga ke v2.0</span>
+
+<span class="cm">## CASE 2: Ambil fitur tertentu dari dev ke release</span>
+git switch release
+git cherry-pick feature-hash-123
+
+<span class="cm">## CASE 3: Recover commit dari branch yang terhapus</span>
+git reflog                        <span class="cm"># cari hash commit</span>
+git cherry-pick recovered-hash</code></pre>
+
+<div class="warn">⚠️ Cherry-pick membuat commit BARU dengan hash berbeda. Jika commit asli di-merge nanti, bisa muncul duplikat diff. Gunakan dengan bijak.</div>`,
+    quickBtns:["Cherry-pick vs merge, kapan pakai?","Cara cherry-pick dari fork repo","Apa itu cherry-pick -x?","Cara cherry-pick multiple commits non-contiguous"]
+  },
+  {
+    title:"Bab 12 — Reflog & Recovery",badge:"Adv",badgeClass:"b-adv",
+    intro:`<b>Reflog — Mesin Waktu Git yang Sesungguhnya</b>
+
+Git Reflog adalah log tersembunyi yang mencatat SETIAP pergerakan HEAD. Ini penyelamat ketika kamu "kehilangan" commit!
+
+<h4>Melihat Reflog</h4>
+<pre><code>git reflog                  <span class="cm"># riwayat HEAD</span>
+git reflog show main        <span class="cm"># riwayat branch main</span>
+git reflog --relative-date  <span class="cm"># tampilkan tanggal</span></code></pre>
+
+<h4>Recovery Scenarios</h4>
+<pre><code><span class="cm">## SCENARIO 1: Reset --hard terlanjur</span>
+git reset --hard HEAD~3    <span class="cm"># OOPS! 3 commit hilang</span>
+git reflog                 <span class="cm"># cari hash sebelum reset</span>
+git reset --hard abc1234   <span class="cm"># kembali ke sebelumnya</span>
+
+<span class="cm">## SCENARIO 2: Branch terhapus tidak sengaja</span>
+git branch -D fitur-penting   <span class="cm"># OOPS!</span>
+git reflog                    <span class="cm"># cari commit hash terakhir branch</span>
+git branch fitur-penting abc1234  <span class="cm"># recreate branch</span>
+
+<span class="cm">## SCENARIO 3: Rebase berantakan</span>
+git reflog                 <span class="cm"># cari status sebelum rebase</span>
+git reset --hard ORIG_HEAD <span class="cm"># kembali ke pre-rebase state</span>
+
+<span class="cm">## SCENARIO 4: Pulihkan file terhapus</span>
+git log --all --full-history -- <span class="st">"path/ke/file.js"</span>
+git checkout [commit-hash] -- <span class="st">"path/ke/file.js"</span></code></pre>
+
+<h4>Git Bisect — Temukan Bug dengan Binary Search</h4>
+<pre><code>git bisect start
+git bisect bad              <span class="cm"># commit sekarang ada bug</span>
+git bisect good v1.0.0      <span class="cm"># commit ini masih oke</span>
+<span class="cm"># Git otomatis checkout commit tengah</span>
+<span class="cm"># Test → tandai good/bad → ulangi sampai ketemu</span>
+git bisect good <span class="cm"># atau</span> git bisect bad
+git bisect reset            <span class="cm"># selesai, kembali ke HEAD</span></code></pre>
+
+<div class="success">✅ Reflog disimpan selama ~90 hari secara default. Hampir tidak ada yang benar-benar "hilang" di Git!</div>`,
+    quickBtns:["Cara recover stash yang hilang","Apa itu ORIG_HEAD?","Cara otomasi git bisect","Git fsck itu apa gunanya?"]
+  },
+  {
+    title:"Bab 13 — Git Hooks",badge:"Adv",badgeClass:"b-adv",
+    intro:`<b>Git Hooks — Otomasi Workflow dengan Script</b>
+
+Hooks = script yang berjalan otomatis saat event Git terjadi. Tersimpan di <code>.git/hooks/</code>.
+
+<h4>Hook yang Paling Berguna</h4>
+<table>
+<tr><th>Hook</th><th>Kapan jalan</th><th>Use case</th></tr>
+<tr><td>pre-commit</td><td>Sebelum commit</td><td>Lint, test, format</td></tr>
+<tr><td>commit-msg</td><td>Setelah isi message</td><td>Validasi format message</td></tr>
+<tr><td>pre-push</td><td>Sebelum push</td><td>Run test suite</td></tr>
+<tr><td>post-merge</td><td>Setelah merge</td><td>npm install otomatis</td></tr>
+<tr><td>pre-rebase</td><td>Sebelum rebase</td><td>Proteksi branch penting</td></tr>
+</table>
+
+<h4>Contoh pre-commit Hook</h4>
+<pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># .git/hooks/pre-commit</span>
+
+echo <span class="st">"Running linter..."</span>
+npm run lint
+if [ $? -ne <span class="num">0</span> ]; then
+  echo <span class="st">"❌ Lint failed! Fix errors before committing."</span>
+  exit <span class="num">1</span>
+fi
+
+echo <span class="st">"Running tests..."</span>
+npm test --silent
+if [ $? -ne <span class="num">0</span> ]; then
+  echo <span class="st">"❌ Tests failed!"</span>
+  exit <span class="num">1</span>
+fi
+echo <span class="st">"✅ All checks passed!"</span></code></pre>
+
+<h4>Husky — Hooks yang Bisa Di-share ke Tim</h4>
+<pre><code><span class="cm"># Install Husky (Node.js project)</span>
+npm install husky --save-dev
+npx husky init
+
+<span class="cm"># Tambah hook</span>
+echo <span class="st">"npm test"</span> > .husky/pre-commit
+echo <span class="st">"npx commitlint --edit"</span> > .husky/commit-msg</code></pre>
+
+<div class="tip">💡 Hooks di <code>.git/hooks/</code> tidak ikut ke-commit. Gunakan <b>Husky</b> agar bisa dishare ke semua anggota tim via package.json.</div>`,
+    quickBtns:["Cara skip hook sementara","Cara setup commitlint","Server-side hooks itu apa?","Cara share hooks tanpa Husky"]
+  },
+  {
+    title:"Bab 14 — Submodule",badge:"Adv",badgeClass:"b-adv",
+    intro:`<b>Git Submodule — Repo di dalam Repo</b>
+
+Submodule = menyertakan repo Git lain sebagai dependency di dalam repo kamu.
+
+<h4>Operasi Submodule</h4>
+<pre><code><span class="cm"># Tambah submodule</span>
+git submodule add https://github.com/user/lib.git libs/lib
+git submodule add --branch main https://github.com/... libs/ui
+
+<span class="cm"># Clone repo yang punya submodule</span>
+git clone --recurse-submodules https://github.com/...
+<span class="cm"># Atau kalau sudah clone biasa:</span>
+git submodule init
+git submodule update
+
+<span class="cm"># Update semua submodule ke commit terbaru</span>
+git submodule update --remote --merge
+
+<span class="cm"># Lihat status submodule</span>
+git submodule status
+
+<span class="cm"># Hapus submodule</span>
+git submodule deinit libs/lib
+git rm libs/lib
+rm -rf .git/modules/libs/lib</code></pre>
+
+<h4>Kapan Pakai Submodule vs Alternatif?</h4>
+<table>
+<tr><th>Solusi</th><th>Cocok untuk</th></tr>
+<tr><td>Submodule</td><td>Share kode antar tim, pinned version penting</td></tr>
+<tr><td>npm/pip</td><td>Library publik, package manager tersedia</td></tr>
+<tr><td>Git Subtree</td><td>Alternatif submodule yang lebih sederhana</td></tr>
+<tr><td>Monorepo</td><td>Semua kode dalam 1 repo besar (Nx, Turborepo)</td></tr>
+</table>
+
+<div class="warn">⚠️ Submodule bisa kompleks untuk tim besar. Pertimbangkan <b>git subtree</b> sebagai alternatif yang lebih sederhana.</div>`,
+    quickBtns:["Submodule vs git subtree","Cara update submodule ke versi tertentu","Cara kerja .gitmodules?","Submodule workflow di tim"]
+  },
+  {
+    title:"Bab 15 — Git Internals",badge:"Pro",badgeClass:"b-pro",
+    intro:`<b>Git Internals — Memahami Cara Kerja di Balik Layar</b>
+
+<h4>4 Tipe Objek Git</h4>
+<pre><code><span class="cm"># Git menyimpan semua data sebagai "objects" di .git/objects/</span>
+
+<span class="num">1</span>. <span class="kw">blob</span>   → isi file
+<span class="num">2</span>. <span class="kw">tree</span>   → struktur direktori (berisi blob + tree lain)
+<span class="num">3</span>. <span class="kw">commit</span> → snapshot (pointer ke tree + metadata + parent)
+<span class="num">4</span>. <span class="kw">tag</span>    → pointer ke commit dengan metadata
+
+<span class="cm"># Inspect objek langsung</span>
+git cat-file -t abc1234    <span class="cm"># tipe objek</span>
+git cat-file -p abc1234    <span class="cm"># isi objek</span>
+git ls-tree HEAD           <span class="cm"># isi tree HEAD</span>
+git ls-tree -r HEAD        <span class="cm"># rekursif</span></code></pre>
+
+<h4>Struktur .git/</h4>
+<pre><code>.git/
+├── HEAD              <span class="cm"># pointer ke branch aktif</span>
+├── config            <span class="cm"># config repo lokal</span>
+├── index             <span class="cm"># staging area (binary)</span>
+├── objects/          <span class="cm"># semua blob/tree/commit/tag</span>
+│   ├── pack/         <span class="cm"># packfiles (terkompresi)</span>
+│   └── info/
+├── refs/
+│   ├── heads/        <span class="cm"># branch lokal</span>
+│   ├── remotes/      <span class="cm"># remote-tracking branches</span>
+│   └── tags/         <span class="cm"># tags
+└── logs/             <span class="cm"># reflog data</span></code></pre>
+
+<h4>Cara Git Menyimpan Data</h4>
+<pre><code><span class="cm"># Setiap objek di-hash dengan SHA-1 (40 karakter)</span>
+<span class="cm"># Content-addressable: hash sama = isi sama</span>
+
+<span class="cm"># Lihat hash suatu file</span>
+git hash-object file.txt
+git hash-object -w file.txt  <span class="cm"># tulis ke object store</span>
+
+<span class="cm"># Explore manual</span>
+cat .git/HEAD                <span class="cm"># → ref: refs/heads/main</span>
+cat .git/refs/heads/main     <span class="cm"># → hash commit terakhir</span></code></pre>
+
+<div class="tip">💡 Memahami Git internals membantu kamu debug masalah kompleks dan memahami MENGAPA perintah Git bekerja seperti itu.</div>`,
+    quickBtns:["Apa itu packfile dan gc?","Bagaimana Git hashing bekerja?","Apa itu Git plumbing commands?","Cara debug repo corrupt"]
+  },
+  {
+    title:"Bab 16 — Rewrite History",badge:"Pro",badgeClass:"b-pro",
+    intro:`<b>Rewrite History — Teknik Tingkat Lanjut</b>
+
+<h4>git commit --amend</h4>
+<pre><code><span class="cm"># Ubah commit TERAKHIR saja</span>
+git commit --amend -m <span class="st">"pesan yang benar"</span>
+git commit --amend --no-edit   <span class="cm"># tambah staged file, pesan sama</span>
+git commit --amend --author=<span class="st">"Nama &lt;email&gt;"</span></code></pre>
+
+<h4>filter-branch (Legacy) vs git-filter-repo (Modern)</h4>
+<pre><code><span class="cm"># KASUS: Hapus file sensitif dari SELURUH history</span>
+<span class="cm"># (misalnya: password, API key yang ter-commit)</span>
+
+<span class="cm"># Cara modern dengan git-filter-repo (install dulu)</span>
+pip install git-filter-repo
+
+git filter-repo --path secrets.env --invert-paths
+git filter-repo --path-glob <span class="st">"*.pem"</span> --invert-paths
+
+<span class="cm"># Hapus folder dari history</span>
+git filter-repo --path old-folder/ --invert-paths
+
+<span class="cm"># Ganti string di seluruh history</span>
+git filter-repo --replace-text replacements.txt</code></pre>
+
+<h4>Interactive Rebase Lanjutan</h4>
+<pre><code><span class="cm"># Split 1 commit jadi beberapa</span>
+git rebase -i HEAD~3
+<span class="cm"># Ganti pick → edit pada commit yang mau di-split</span>
+git reset HEAD^          <span class="cm"># unstage semua</span>
+git add -p               <span class="cm"># stage sebagian</span>
+git commit -m <span class="st">"bagian pertama"</span>
+git add -p               <span class="cm"># stage sisa</span>
+git commit -m <span class="st">"bagian kedua"</span>
+git rebase --continue</code></pre>
+
+<div class="danger">🚨 Setelah rewrite history yang sudah di-push: <br>
+1. Koordinasi dengan tim<br>
+2. Semua orang harus <code>git fetch --all && git reset --hard origin/main</code><br>
+3. Pertimbangkan menggunakan BFG Repo Cleaner untuk repo besar</div>`,
+    quickBtns:["Cara hapus file sensitif dari history","BFG Repo Cleaner itu apa?","Cara ganti email di seluruh history","Dampak rewrite history ke tim"]
+  },
+  {
+    title:"Bab 17 — Workflows & CI/CD",badge:"Pro",badgeClass:"b-pro",
+    intro:`<b>Git Workflows — Strategi untuk Tim Profesional</b>
+
+<h4>1. GitHub Flow (Simple, Recommended)</h4>
+<pre><code>main → selalu deployable
+feature/* → branch dari main, PR ke main
+
+<span class="cm"># Workflow:</span>
+git switch -c feature/nama
+<span class="cm"># ... kerja, commit ...</span>
+git push -u origin feature/nama
+<span class="cm"># Buat Pull Request → review → merge → deploy</span></code></pre>
+
+<h4>2. Git Flow (Complex Products)</h4>
+<pre><code>main/master → production only
+develop     → integrasi fitur
+feature/*   → fitur baru (dari develop)
+release/*   → persiapan rilis (dari develop)
+hotfix/*    → fix urgent (dari main)</code></pre>
+
+<h4>3. Trunk Based Development</h4>
+<pre><code><span class="cm"># Semua push ke main/trunk langsung</span>
+<span class="cm"># Pakai feature flags untuk hide incomplete features</span>
+<span class="cm"># Short-lived branches (<1 hari)</span>
+<span class="cm"># Cocok untuk: CI/CD agresif, tim yang mature</span></code></pre>
+
+<h4>CI/CD dengan Git</h4>
+<pre><code><span class="cm"># .github/workflows/ci.yml</span>
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm test
+      - run: npm run build
+
+<span class="cm"># Protect main branch:</span>
+<span class="cm"># - Require PR reviews</span>
+<span class="cm"># - Require CI to pass</span>
+<span class="cm"># - No direct push</span></code></pre>
+
+<div class="tip">💡 Untuk startups & SaaS: <b>GitHub Flow</b>. Untuk produk dengan multiple versions: <b>Git Flow</b>. Untuk tim DevOps mature: <b>Trunk Based</b>.</div>`,
+    quickBtns:["GitHub Flow vs Git Flow vs Trunk Based","Cara setup branch protection","Cara automate semantic versioning","Cara setup monorepo workflow"]
+  },
+  {
+    title:"Bab 18 — Advanced Tricks",badge:"Pro",badgeClass:"b-pro",
+    intro:`<b>Advanced Git Tricks — Jurus Terakhir Git Master</b>
+
+<h4>Worktree — Checkout Multiple Branch Bersamaan</h4>
+<pre><code><span class="cm"># Buka branch lain di folder terpisah (tanpa stash!)</span>
+git worktree add ../hotfix hotfix/urgent-bug
+git worktree list
+git worktree remove ../hotfix</code></pre>
+
+<h4>Sparse Checkout — Clone Sebagian Repo Besar</h4>
+<pre><code>git clone --filter=blob:none --sparse https://github.com/...
+git sparse-checkout init --cone
+git sparse-checkout set src/frontend  <span class="cm"># hanya folder ini</span></code></pre>
+
+<h4>Git Attributes</h4>
+<pre><code><span class="cm"># .gitattributes</span>
+*.png binary                      <span class="cm"># treat sebagai binary</span>
+*.js diff=javascript              <span class="cm"># custom differ</span>
+*.md merge=union                  <span class="cm"># merge strategy</span>
+/dist/** linguist-generated=true  <span class="cm"># GitHub: bukan kode asli</span></code></pre>
+
+<h4>Advanced Aliases yang Powerful</h4>
+<pre><code>git config --global alias.lg \
+  "log --oneline --graph --all --decorate"
+
+git config --global alias.undo \
+  "reset --soft HEAD~1"
+
+git config --global alias.wip \
+  "!git add -A && git commit -m 'WIP'"
+
+git config --global alias.aliases \
+  "config --get-regexp '^alias\\.'"
+
+<span class="cm"># Cari commit yang hapus/tambah string tertentu</span>
+git log -S <span class="st">"functionName"</span> --source --all
+git log -G <span class="st">"regex pattern"</span>   <span class="cm"># pakai regex</span></code></pre>
+
+<h4>Partial Clone & Shallow Clone</h4>
+<pre><code><span class="cm"># Shallow (hanya N commit terakhir)</span>
+git clone --depth 50 https://github.com/...
+
+<span class="cm"># Clone tanpa blobs (blobless)</span>
+git clone --filter=blob:none https://github.com/...
+
+<span class="cm"># Clone tanpa tree (treeless, paling minimal)</span>
+git clone --filter=tree:0 https://github.com/...</code></pre>
+
+<div class="success">✅ Selamat! Kamu sudah punya pengetahuan dari Git pemula sampai master. Practice is key — gunakan semua ini di proyek nyata!</div>`,
+    quickBtns:["Git notes itu apa?","Cara setup multiple SSH keys","Cara optimize repo yang lambat","Trik git yang jarang diketahui"]
+  },
+  {
+    title:"Bab 19 — Troubleshooting",badge:"Pro",badgeClass:"b-pro",
+    intro:`<b>Troubleshooting — Solusi Masalah Git yang Umum</b>
+
+<h4>Masalah & Solusi Paling Umum</h4>
+
+<pre><code><span class="cm">## 1. "Detached HEAD"</span>
+git switch main          <span class="cm"># kembali ke branch</span>
+<span class="cm"># Atau simpan perubahan dulu:</span>
+git switch -c temp-branch
+git switch main
+git merge temp-branch
+
+<span class="cm">## 2. Push ditolak (non-fast-forward)</span>
+git pull --rebase origin main   <span class="cm"># rebase dulu</span>
+git push origin main
+
+<span class="cm">## 3. Merge conflict di banyak file</span>
+git mergetool                   <span class="cm"># pakai visual tool</span>
+git checkout --ours file.js     <span class="cm"># pakai versi kita</span>
+git checkout --theirs file.js   <span class="cm"># pakai versi mereka</span>
+
+<span class="cm">## 4. Commit ke branch yang salah</span>
+git log --oneline -3             <span class="cm"># catat hash</span>
+git switch branch-yang-benar
+git cherry-pick abc1234          <span class="cm"># pindahkan commit</span>
+git switch branch-salah
+git reset --hard HEAD~1          <span class="cm"># hapus dari sini</span>
+
+<span class="cm">## 5. .gitignore tidak berfungsi (file sudah tracked)</span>
+git rm --cached namafile.env     <span class="cm"># untrack file</span>
+git rm --cached -r folder/       <span class="cm"># untrack folder</span>
+git commit -m <span class="st">"chore: untrack cached files"</span>
+
+<span class="cm">## 6. Repo terlalu besar / lambat</span>
+git gc --aggressive --prune=now  <span class="cm"># garbage collect</span>
+git count-objects -vH            <span class="cm"># cek ukuran</span>
+
+<span class="cm">## 7. SSL Certificate error</span>
+git config --global http.sslVerify false   <span class="cm"># (tidak aman!)</span>
+<span class="cm"># Lebih baik: update CA certificates</span></code></pre>
+
+<div class="success">✅ <b>Ingat:</b> Hampir semua kesalahan di Git bisa dipulihkan. Selalu coba <code>git reflog</code> sebelum panik!</div>
+
+<h4>Cek Kesehatan Repo</h4>
+<pre><code>git fsck --full         <span class="cm"># periksa integritas</span>
+git count-objects -vH   <span class="cm"># statistik objek</span>
+git verify-pack -v .git/objects/pack/*.pack | sort -k 3 -n | tail -10
+<span class="cm"># ↑ cari file besar di history</span></code></pre>`,
+    quickBtns:["Cara fix 'fatal: not a git repository'","Cara fix permission denied saat push","Cara hapus file besar dari history","Cara fix corrupt git repository"]
+  }
+];
+
+const RESPONSES = {
+  "Apa bedanya Git dan GitHub?": `Git dan GitHub adalah dua hal berbeda:
+
+<h4>Git</h4>
+<ul>
+<li><b>Software</b> yang berjalan di komputermu</li>
+<li>Gratis, open source, bisa dipakai offline</li>
+<li>Mengelola version control secara lokal</li>
+<li>Dibuat oleh Linus Torvalds (2005)</li>
+</ul>
+
+<h4>GitHub</h4>
+<ul>
+<li><b>Platform hosting</b> online untuk repo Git</li>
+<li>Milik Microsoft, punya versi free & berbayar</li>
+<li>Tambahan: Pull Requests, Issues, Actions, dll</li>
+<li>Alternatif: GitLab, Bitbucket, Gitea</li>
+</ul>
+
+<div class="tip">💡 Analogi: Git = Microsoft Word (software menulis). GitHub = Google Drive (tempat menyimpan & share dokumen).</div>
+
+Mau lanjut ke instalasi Git?`,
+
+  "Apa itu staging area dan kenapa perlu?": `<b>Staging Area</b> (juga disebut Index) adalah area "antara" working directory dan repository.
+
+<h4>Kenapa perlu staging area?</h4>
+<pre><code><span class="cm"># Bayangkan kamu edit 5 file sekaligus:</span>
+<span class="cm"># - auth.js (fitur login)</span>
+<span class="cm"># - ui.css (perbaikan tampilan)</span>
+<span class="cm"># - README.md (update docs)</span>
+<span class="cm"># - test.js (tambah test)</span>
+<span class="cm"># - debug.log (file debug sementara)</span>
+
+<span class="cm"># Tanpa staging: harus commit semua sekaligus 😱</span>
+<span class="cm"># Dengan staging: bisa commit terpisah dan rapi!</span>
+
+git add auth.js test.js
+git commit -m <span class="st">"feat: implement login with tests"</span>
+
+git add ui.css
+git commit -m <span class="st">"style: fix button alignment"</span>
+
+git add README.md
+git commit -m <span class="st">"docs: update setup instructions"</span>
+
+<span class="cm"># debug.log: tidak di-add sama sekali ✅</span></code></pre>
+
+<div class="success">✅ Staging area = kontrol penuh atas APA yang masuk ke tiap commit. Ini yang membuat history Git bisa bersih dan bermakna!</div>`,
+
+  "Apa itu HEAD?": `<b>HEAD</b> adalah pointer yang selalu menunjuk ke posisi kamu saat ini di Git.
+
+<pre><code><span class="cm"># HEAD biasanya menunjuk ke branch aktif:</span>
+cat .git/HEAD
+<span class="cm"># → ref: refs/heads/main</span>
+
+<span class="cm"># refs/heads/main menunjuk ke hash commit terbaru</span>
+cat .git/refs/heads/main
+<span class="cm"># → abc1234def5678...</span>
+
+<span class="cm"># Navigasi dengan HEAD:</span>
+HEAD       <span class="cm"># commit saat ini</span>
+HEAD~1     <span class="cm"># 1 commit sebelumnya</span>
+HEAD~3     <span class="cm"># 3 commit sebelumnya</span>
+HEAD^      <span class="cm"># parent commit (sama dengan HEAD~1)</span>
+HEAD^^     <span class="cm"># grandparent commit</span>
+HEAD^2     <span class="cm"># parent kedua (merge commit)</span></code></pre>
+
+<h4>Detached HEAD</h4>
+<pre><code><span class="cm"># Terjadi saat kamu checkout ke commit langsung:</span>
+git checkout abc1234   <span class="cm"># → HEAD sekarang detached!</span>
+cat .git/HEAD
+<span class="cm"># → abc1234def5678... (bukan ref ke branch)</span>
+
+<span class="cm"># Cara kembali ke branch:</span>
+git switch main</code></pre>
+
+<div class="warn">⚠️ Saat detached HEAD, commit baru yang kamu buat tidak akan terhubung ke branch manapun dan bisa "hilang" jika tidak diberi nama branch.</div>`,
+
+  "Rebase vs Merge: kapan pakai mana?": `<b>Panduan praktis memilih Rebase vs Merge:</b>
+
+<table>
+<tr><th>Situasi</th><th>Gunakan</th></tr>
+<tr><td>Branch feature yang belum di-push</td><td>Rebase ke main</td></tr>
+<tr><td>Branch feature yang sudah di-push</td><td>Merge (lebih aman)</td></tr>
+<tr><td>PR/MR ke main di tim</td><td>Merge (atau squash merge)</td></tr>
+<tr><td>Update branch dari main terbaru</td><td>Rebase (linear history)</td></tr>
+<tr><td>Gabung release branch</td><td>Merge --no-ff (perlu merge commit)</td></tr>
+<tr><td>Banyak "WIP" commits kecil</td><td>Squash merge</td></tr>
+</table>
+
+<pre><code><span class="cm">## RULE OF THUMB:</span>
+<span class="cm"># Public/shared branch → MERGE (preserve history)</span>
+<span class="cm"># Private/local branch → REBASE (clean history)</span>
+
+<span class="cm"># Pro workflow yang umum:</span>
+git switch feature/auth
+git fetch origin
+git rebase origin/main   <span class="cm"># update dari main terbaru</span>
+<span class="cm"># Push → PR → Squash merge ke main</span></code></pre>
+
+<div class="tip">💡 Tim yang fokus ke <b>clean linear history</b>: pakai Rebase + Squash. Tim yang fokus ke <b>akurasi timeline</b>: pakai Merge --no-ff.</div>`,
+
+  "Cara setup SSH key untuk GitHub": `<b>Setup SSH Key untuk GitHub</b>
+
+<pre><code><span class="cm"># 1. Generate SSH key baru</span>
+ssh-keygen -t ed25519 -C <span class="st">"email@kamu.com"</span>
+<span class="cm"># Tekan Enter untuk semua default</span>
+<span class="cm"># Key tersimpan di: ~/.ssh/id_ed25519</span>
+
+<span class="cm"># 2. Tambah ke SSH agent</span>
+eval <span class="st">"$(ssh-agent -s)"</span>
+ssh-add ~/.ssh/id_ed25519
+
+<span class="cm"># 3. Salin public key</span>
+cat ~/.ssh/id_ed25519.pub
+<span class="cm"># Copy outputnya</span>
+
+<span class="cm"># 4. Di GitHub:</span>
+<span class="cm"># Settings → SSH and GPG keys → New SSH key</span>
+<span class="cm"># Paste public key, beri nama, Save</span>
+
+<span class="cm"># 5. Test koneksi</span>
+ssh -T git@github.com
+<span class="cm"># → Hi username! You've successfully authenticated...</span>
+
+<span class="cm"># 6. Gunakan SSH URL (bukan HTTPS)</span>
+git clone git@github.com:user/repo.git
+<span class="cm"># Atau ganti remote yang ada:</span>
+git remote set-url origin git@github.com:user/repo.git</code></pre>
+
+<div class="success">✅ Dengan SSH, tidak perlu input password setiap push/pull!</div>`,
+
+  "default": `Pertanyaan bagus! Topik ini sangat relevan untuk pemahaman Git yang lebih dalam.
+
+Saya sedang memproses pertanyaanmu... Untuk pertanyaan spesifik seperti ini, saya sarankan kamu coba eksperimen langsung di terminal — Git sangat "learn by doing"!
+
+<div class="tip">💡 <b>Tips belajar Git:</b> Buat repo percobaan khusus untuk eksperimen. Tidak ada yang bisa kamu "rusak permanen" di repo lokal — Git selalu punya jalan pulang!</div>
+
+Klik tombol di bawah atau ketik pertanyaan lanjutan tentang topik ini.`
+};
+
+let currentChap = 0;
+let isTyping = false;
+const chatArea = document.getElementById('chat-area');
+
+function scrollToBottom(){chatArea.scrollTop=chatArea.scrollHeight}
+
+function addMsg(html,isUser=false){
+  const msg=document.createElement('div');
+  msg.className='msg'+(isUser?' user':'');
+  const av=document.createElement('div');
+  av.className='avatar '+(isUser?'usr':'bot');
+  av.textContent=isUser?'Kamu':'G';
+  const bub=document.createElement('div');
+  bub.className='bubble';
+  bub.innerHTML=html;
+  msg.appendChild(av);
+  msg.appendChild(bub);
+  chatArea.appendChild(msg);
+  scrollToBottom();
+  return bub;
+}
+
+function addTyping(){
+  const msg=document.createElement('div');
+  msg.className='msg';
+  msg.id='typing-msg';
+  const av=document.createElement('div');
+  av.className='avatar bot';
+  av.textContent='G';
+  const bub=document.createElement('div');
+  bub.className='bubble';
+  bub.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  msg.appendChild(av);
+  msg.appendChild(bub);
+  chatArea.appendChild(msg);
+  scrollToBottom();
+  return msg;
+}
+
+function removeTyping(){
+  const t=document.getElementById('typing-msg');
+  if(t)t.remove();
+}
+
+function addQuickBtns(btns){
+  const div=document.createElement('div');
+  div.className='quick-btns';
+  btns.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='qb';
+    btn.textContent=b;
+    btn.onclick=()=>{handleQuick(b);div.remove()};
+    div.appendChild(btn);
+  });
+  chatArea.appendChild(div);
+  scrollToBottom();
+}
+
+function loadChapter(idx){
+  currentChap=idx;
+  const ch=CHAPTERS[idx];
+  document.getElementById('chapter-title').textContent=ch.title;
+  const badge=document.getElementById('chapter-badge');
+  badge.textContent=ch.badge;
+  badge.className='badge-lvl '+ch.badgeClass;
+  const pct=Math.round(((idx+1)/CHAPTERS.length)*100);
+  document.getElementById('progress').style.width=pct+'%';
+  chatArea.innerHTML='';
+  addMsg(ch.intro);
+  if(ch.quickBtns)addQuickBtns(ch.quickBtns);
+  document.querySelectorAll('.chap-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===idx);
+  });
+  const sidebar=document.getElementById('sidebar');
+  if(sidebar.classList.contains('open'))sidebar.classList.remove('open');
+}
+
+function handleQuick(text){
+  addMsg(text,true);
+  isTyping=true;
+  document.getElementById('send-btn').disabled=true;
+  const t=addTyping();
+  setTimeout(()=>{
+    t.remove();
+    const resp=RESPONSES[text]||RESPONSES['default'];
+    addMsg(resp);
+    const qb=CHAPTERS[currentChap].quickBtns||[];
+    const filtered=qb.filter(b=>b!==text).slice(0,3);
+    if(filtered.length)addQuickBtns(filtered);
+    isTyping=false;
+    document.getElementById('send-btn').disabled=false;
+  },900+Math.random()*600);
+}
+
+function sendMsg(){
+  const inp=document.getElementById('user-input');
+  const text=inp.value.trim();
+  if(!text||isTyping)return;
+  inp.value='';
+  inp.style.height='40px';
+  addMsg(text,true);
+  isTyping=true;
+  document.getElementById('send-btn').disabled=true;
+  const t=addTyping();
+  setTimeout(()=>{
+    t.remove();
+    const resp=RESPONSES[text]||getContextualResp(text);
+    addMsg(resp);
+    const qb=CHAPTERS[currentChap].quickBtns||[];
+    if(qb.length)addQuickBtns(qb.slice(0,3));
+    isTyping=false;
+    document.getElementById('send-btn').disabled=false;
+  },800+Math.random()*800);
+}
+
+function getContextualResp(text){
+  const ch=CHAPTERS[currentChap];
+  return `Pertanyaan yang bagus tentang <b>${ch.title}</b>!
+
+Untuk topik "<i>${text}</i>", berikut poin penting yang perlu kamu pahami:
+
+<div class="tip">💡 Ini adalah area yang sering membingungkan developer. Kuncinya adalah praktek langsung — coba di repo percobaan dulu sebelum di repo production!</div>
+
+Untuk jawaban yang lebih mendalam, coba eksplorasi dokumentasi resmi Git (<code>git help [command]</code>) atau gunakan <code>man git-[command]</code> di terminal.
+
+Apakah ada aspek spesifik dari topik ini yang ingin kamu perdalam?`;
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+document.querySelectorAll('.chap-item').forEach((el,i)=>{
+  el.addEventListener('click',()=>loadChapter(i));
+});
+
+const inp=document.getElementById('user-input');
+inp.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}
+});
+inp.addEventListener('input',()=>{
+  inp.style.height='40px';
+  inp.style.height=Math.min(inp.scrollHeight,100)+'px';
+});
+
+loadChapter(0);
+</script>
